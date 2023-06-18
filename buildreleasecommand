@@ -1,0 +1,28 @@
+1) admin
+
+To Build admin Build Release :- flutter build apk --release -t lib/main-admin.dart --flavor admin --no-tree-shake-icons
+To Build admin Build Debug   :- flutter build apk --debug -t lib/main-admin.dart --flavor admin --no-tree-shake-icons
+To Run admin Build Release   :- flutter run --release -t lib/main-admin.dart --flavor admin
+To Run admin Build Debug     :- flutter run --debug -t lib/main-admin.dart --flavor admin
+To Build admin Build Web Release :- flutter build web --release -t lib/main-admin.dart --no-tree-shake-icons --web-renderer canvaskit
+To Run admin Build Web Release :- flutter run -d chrome --release -t lib/main-admin.dart
+To Rub admin Web Server :- flutter run -d web-server --web-port 8080 --web-hostname 0.0.0.0 -t lib/main-admin.dart --web-renderer canvaskit
+
+2) user
+
+To Build user Build Release :- flutter build apk --release -t lib/main-user.dart --flavor user --no-tree-shake-icons
+To Build user Build Debug   :- flutter build apk --debug -t lib/main-user.dart --flavor user --no-tree-shake-icons
+To Build user ios Build Release :- flutter build ios --release -t lib/main-user.dart --no-tree-shake-icons
+To Run user Build Release   :- flutter run --release -t lib/main-user.dart --flavor user
+To Run user Build Debug     :- flutter run --debug -t lib/main-user.dart --flavor user
+To Build user Build Web Release :- flutter build web --release -t lib/main-user.dart --no-tree-shake-icons --web-renderer canvaskit
+To Run user Build Web Release :- flutter run -d chrome --release -t lib/main-user.dart
+To Rub user Web Server :- flutter run -d web-server --web-port 8080 --web-hostname 0.0.0.0 -t lib/main-user.dart --web-renderer canvaskit
+
+to update icon in flutter command
+
+flutter pub get
+dart pub run flutter_launcher_icons:main
+
+
+firebase hosting:channel:deploy preview_name
