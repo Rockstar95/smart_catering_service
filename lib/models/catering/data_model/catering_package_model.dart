@@ -1,26 +1,24 @@
 import '../../../utils/my_utils.dart';
 import '../../../utils/parsing_helper.dart';
 
-class ChapterModel {
+class CateringPackageModel {
   String id = "";
   String title = "";
   String description = "";
-  String url = "";
   String thumbnailUrl = "";
-  String googleFormUrl = "";
   bool enabled = false;
+  double price = 0;
 
-  ChapterModel({
+  CateringPackageModel({
     this.id = "",
     this.title = "",
     this.description = "",
-    this.url = "",
     this.thumbnailUrl = "",
-    this.googleFormUrl = "",
     this.enabled = false,
+    this.price = 0,
   });
 
-  ChapterModel.fromMap(Map<String, dynamic> map) {
+  CateringPackageModel.fromMap(Map<String, dynamic> map) {
     initializeFromMap(map);
   }
 
@@ -32,10 +30,9 @@ class ChapterModel {
     id = ParsingHelper.parseStringMethod(map['id']);
     title = ParsingHelper.parseStringMethod(map['title']);
     description = ParsingHelper.parseStringMethod(map['description']);
-    url = ParsingHelper.parseStringMethod(map['url']);
     thumbnailUrl = ParsingHelper.parseStringMethod(map['thumbnailUrl']);
-    googleFormUrl = ParsingHelper.parseStringMethod(map['googleFormUrl']);
     enabled = ParsingHelper.parseBoolMethod(map['enabled']);
+    price = ParsingHelper.parseDoubleMethod(map['price']);
   }
 
   Map<String, dynamic> toMap({bool toJson = false}) {
@@ -43,10 +40,9 @@ class ChapterModel {
       "id" : id,
       "title" : title,
       "description" : description,
-      "url" : url,
       "thumbnailUrl" : thumbnailUrl,
-      "googleFormUrl" : googleFormUrl,
       "enabled" : enabled,
+      "price" : price,
     };
   }
 

@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../../utils/my_print.dart';
 import '../../views/authentication/screens/login_screen.dart';
+import '../../views/catering/screens/course_details_screen.dart';
 import '../../views/common/screens/splashscreen.dart';
-import '../../views/courses/screens/course_details_screen.dart';
 import '../../views/homescreen/screens/homescreen.dart';
+import '../../views/profile/screens/edit_profile_screen.dart';
 import 'navigation_arguments.dart';
 import 'navigation_operation.dart';
 import 'navigation_operation_parameters.dart';
@@ -153,6 +154,11 @@ class NavigationController {
           page = parseLoginScreen(settings: settings);
           break;
         }
+      case EditProfileScreen.routeName:
+        {
+          page = parseEditProfileScreen(settings: settings);
+          break;
+        }
       case HomeScreen.routeName:
         {
           page = parseHomeScreen(settings: settings);
@@ -182,13 +188,22 @@ class NavigationController {
     return const LoginScreen();
   }
 
+  static Widget? parseEditProfileScreen({required RouteSettings settings}) {
+    dynamic argument = settings.arguments;
+    if (argument is EditProfileScreenNavigationArguments) {
+      return EditProfileScreen(arguments: argument);
+    } else {
+      return null;
+    }
+  }
+
   static Widget? parseHomeScreen({required RouteSettings settings}) {
     return const HomeScreen();
   }
 
   static Widget? parseCourseDetailsScreen({required RouteSettings settings}) {
     dynamic argument = settings.arguments;
-    if (argument is CourseDetailsScreenNavigationArguments) {
+    if (argument is CateringDetailsScreenNavigationArguments) {
       return CourseDetailsScreen(arguments: argument);
     } else {
       return null;
@@ -205,6 +220,15 @@ class NavigationController {
     ));
   }
 
+  static Future<dynamic> navigateToEditProfileScreen({required NavigationOperationParameters navigationOperationParameters, required EditProfileScreenNavigationArguments arguments}) {
+    return NavigationOperation.navigate(
+      navigationOperationParameters: navigationOperationParameters.copyWith(
+        routeName: EditProfileScreen.routeName,
+        arguments: arguments,
+      ),
+    );
+  }
+
   static Future<dynamic> navigateToHomeScreen({required NavigationOperationParameters navigationOperationParameters}) {
     return NavigationOperation.navigate(
         navigationOperationParameters: navigationOperationParameters.copyWith(
@@ -214,7 +238,7 @@ class NavigationController {
 
   static Future<dynamic> navigateToCourseDetailsScreen({
     required NavigationOperationParameters navigationOperationParameters,
-    required CourseDetailsScreenNavigationArguments arguments,
+    required CateringDetailsScreenNavigationArguments arguments,
   }) {
     return NavigationOperation.navigate(
       navigationOperationParameters: navigationOperationParameters.copyWith(

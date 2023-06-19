@@ -67,11 +67,13 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
 
   @override
   Widget build(BuildContext context) {
+    super.pageBuild();
+
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
         body: Container(
-          padding: const EdgeInsets.only(top: 0),
+          padding: const EdgeInsets.only(top: 0, left: 20, right: 20),
           child: Center(
             child: Form(
               key: _formKey,
@@ -81,12 +83,8 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
                   children: <Widget>[
                     getLogo(),
                     getLoginText(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        getLoginWithGoogleButton(),
-                      ],
-                    ),
+                    const SizedBox(height: 50),
+                    getLoginWithGoogleButton(),
                   ],
                 ),
               ),
@@ -100,9 +98,12 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
   Widget getLogo() {
     return Container(
       margin: const EdgeInsets.only(bottom: 34),
-      width: 100,
-      height: 100,
-      child: Image.asset(AppAssets.logo),
+      width: 150,
+      height: 150,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset(AppAssets.logo),
+      ),
     );
   }
 
@@ -136,7 +137,21 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
           borderRadius: const BorderRadius.all(Radius.circular(50)),
           border: Border.all(color: themeData.primaryColor),
         ),
-        child: Image.asset('assets/google.png', height: 26),
+        child: Row(
+          children: [
+            Image.asset(AppAssets.googleLogo, height: 26),
+            Expanded(
+              child: Center(
+                child: Text(
+                  "Login With Google",
+                  style: themeData.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,36 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../utils/my_utils.dart';
 import '../../../utils/parsing_helper.dart';
-import 'chapter_model.dart';
 
-class CourseModel {
+class PartyPlotModel {
   String id = "";
   String title = "";
   String description = "";
-  String coursePreviewUrl = "";
   String thumbnailUrl = "";
-  String backgroundColor = "";
+  String locationArea = "";
+  String locationCity = "";
+  double minPeople = 0;
+  double maxPeople = 0;
   bool enabled = true;
   Timestamp? createdTime;
   Timestamp? updatedTime;
-  List<ChapterModel> chapters = <ChapterModel>[];
+  List<String> photos = <String>[];
 
-  CourseModel({
+  PartyPlotModel({
     this.id = "",
     this.title = "",
     this.description = "",
-    this.coursePreviewUrl = "",
     this.thumbnailUrl = "",
-    this.backgroundColor = "",
+    this.locationArea = "",
+    this.locationCity = "",
+    this.minPeople = 0,
+    this.maxPeople = 0,
     this.enabled = true,
     this.createdTime,
     this.updatedTime,
-    List<ChapterModel>? chapters,
+    List<String>? photos,
   }) {
-    this.chapters = chapters ?? <ChapterModel>[];
+    this.photos = photos ?? <String>[];
   }
 
-  CourseModel.fromMap(Map<String, dynamic> map) {
+  PartyPlotModel.fromMap(Map<String, dynamic> map) {
     initializeFromMap(map);
   }
 
@@ -43,18 +46,18 @@ class CourseModel {
     id = ParsingHelper.parseStringMethod(map['id']);
     title = ParsingHelper.parseStringMethod(map['title']);
     description = ParsingHelper.parseStringMethod(map['description']);
-    coursePreviewUrl = ParsingHelper.parseStringMethod(map['coursePreviewUrl']);
     thumbnailUrl = ParsingHelper.parseStringMethod(map['thumbnailUrl']);
-    backgroundColor = ParsingHelper.parseStringMethod(map['backgroundColor']);
+    locationArea = ParsingHelper.parseStringMethod(map['locationArea']);
+    locationCity = ParsingHelper.parseStringMethod(map['locationCity']);
+    minPeople = ParsingHelper.parseDoubleMethod(map['minPeople']);
+    maxPeople = ParsingHelper.parseDoubleMethod(map['maxPeople']);
     enabled = ParsingHelper.parseBoolMethod(map['enabled']);
     createdTime = ParsingHelper.parseTimestampMethod(map['createdTime']);
     updatedTime = ParsingHelper.parseTimestampMethod(map['updatedTime']);
 
-    chapters.clear();
-    List<Map<String, dynamic>> chaptersMapsList = ParsingHelper.parseMapsListMethod<String, dynamic>(map['chapters']);
-    chapters.addAll(chaptersMapsList.map((e) {
-      return ChapterModel.fromMap(e);
-    }).toList());
+    photos.clear();
+    List<String> photosList = ParsingHelper.parseListMethod<dynamic, String>(map['photos']);
+    photos.addAll(photosList);
   }
 
   Map<String, dynamic> toMap({bool toJson = false}) {
@@ -62,13 +65,15 @@ class CourseModel {
       "id" : id,
       "title" : title,
       "description" : description,
-      "coursePreviewUrl" : coursePreviewUrl,
       "thumbnailUrl" : thumbnailUrl,
-      "backgroundColor" : backgroundColor,
+      "locationArea" : locationArea,
+      "locationCity" : locationCity,
+      "minPeople" : minPeople,
+      "maxPeople" : maxPeople,
       "enabled" : enabled,
       "createdTime" : createdTime,
       "updatedTime" : updatedTime,
-      "chapters" : chapters.map((e) => e.toMap(toJson: toJson)).toList(),
+      "photos" : photos,
     };
   }
 

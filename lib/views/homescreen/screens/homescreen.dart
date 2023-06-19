@@ -1,5 +1,4 @@
-import 'package:smart_catering_service/backend/course/course_provider.dart';
-import 'package:smart_catering_service/views/courses/screens/all_courses_list_screen.dart';
+import 'package:smart_catering_service/backend/course/catering_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,7 @@ import '../../../backend/home_screen/home_screen_provider.dart';
 import '../../../configs/styles.dart';
 import '../../../utils/my_print.dart';
 import '../../../utils/my_safe_state.dart';
+import '../../catering/screens/catering_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   late HomeScreenProvider homeScreenProvider;
 
-  Widget? allCoursesListScreenWidget, myCoursesListScreenWidget, profileWidget;
+  Widget? cateringScreenWidget, myCoursesListScreenWidget, profileWidget;
 
   //region Tab Handling
   _handleTabSelection() {
@@ -94,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             body: TabBarView(
               controller: _tabController,
               children: <Widget>[
-                getAllCoursesListScreen(),
-                getMyCoursesListScreen(),
+                getCateringScreen(),
+                getPartyPlotScreen(),
                 getUserProfile(),
               ],
             ),
@@ -151,16 +151,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             tabs:  const <Widget>[
               Tab(
                 icon: Icon(
-                  Icons.video_library_outlined,
+                  Icons.emoji_food_beverage_rounded,
                   size: 20,
                 ),
                 iconMargin: EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                text: "All Courses",
+                text: "Catering",
               ),
               Tab(
-                icon: Icon(Icons.play_lesson_outlined,size: 20),
+                icon: Icon(Icons.business,size: 20),
                 iconMargin: EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                text: "My Courses",
+                text: "Party Plot",
               ),
               Tab(
                 icon: Icon(
@@ -202,14 +202,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   //endregion
 
-  Widget getAllCoursesListScreen() {
-    allCoursesListScreenWidget ??= AllCoursesListScreen(courseProvider: courseProvider);
+  Widget getCateringScreen() {
+    cateringScreenWidget ??= CateringScreen(courseProvider: courseProvider);
 
-    return allCoursesListScreenWidget!;
+    return cateringScreenWidget!;
   }
 
-  Widget getMyCoursesListScreen() {
-    myCoursesListScreenWidget ??= MyCoursesListScreen(courseProvider: courseProvider);
+  Widget getPartyPlotScreen() {
+    myCoursesListScreenWidget ??= const Center(
+      child: Text("Enquiry"),
+    );
 
     return myCoursesListScreenWidget!;
   }

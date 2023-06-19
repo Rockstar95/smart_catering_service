@@ -1,5 +1,4 @@
-import 'package:smart_catering_service/models/course/data_model/chapter_model.dart';
-import 'package:smart_catering_service/models/course/data_model/course_model.dart';
+import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
 
 import '../../models/user/data_model/user_model.dart';
 
@@ -25,20 +24,10 @@ class EditProfileScreenNavigationArguments extends NavigationArguments {
   });
 }
 
-class CourseDetailsScreenNavigationArguments extends NavigationArguments {
-  final CourseModel courseModel;
+class CateringDetailsScreenNavigationArguments extends NavigationArguments {
+  final CateringModel cateringModel;
 
-  const CourseDetailsScreenNavigationArguments({
-    required this.courseModel,
-  });
-}
-
-class CoursePlayerScreenNavigationArguments extends NavigationArguments {
-  final ChapterModel chapterModel;
-  final CourseModel courseModel;
-
-  const CoursePlayerScreenNavigationArguments({
-    required this.chapterModel,
-    required this.courseModel,
+  const CateringDetailsScreenNavigationArguments({
+    required this.cateringModel,
   });
 }

@@ -2,8 +2,8 @@ import '../backend/common/firestore_controller.dart';
 import 'typedefs.dart';
 
 class AppConstants {
-  static const int coursesDocumentLimitForPagination = 10;
-  static const int coursesRefreshLimitForPagination = 3;
+  static const int cateringsDocumentLimitForPagination = 10;
+  static const int cateringsRefreshLimitForPagination = 3;
 }
 
 class FirestoreExceptionCodes {
@@ -11,61 +11,42 @@ class FirestoreExceptionCodes {
 }
 
 class FirebaseNodes {
-  //region Admin
-  static const String adminCollection = "admin";
+  //region Admin User
+  static const String adminUsersCollection = "adminUsers";
 
-  static MyFirestoreCollectionReference get adminCollectionReference => FirestoreController.collectionReference(
-    collectionName: adminCollection,
+  static MyFirestoreCollectionReference get adminUsersCollectionReference => FirestoreController.collectionReference(
+    collectionName: adminUsersCollection,
   );
 
-  static MyFirestoreDocumentReference adminDocumentReference({String? documentId}) => FirestoreController.documentReference(
-    collectionName: adminCollection,
-    documentId: documentId,
-  );
-
-  //region Property Document
-  static const String propertyDocument = "property";
-
-  static MyFirestoreDocumentReference get adminPropertyDocumentReference => adminDocumentReference(
-    documentId: propertyDocument,
+  static MyFirestoreDocumentReference adminUserDocumentReference({String? userId}) => FirestoreController.documentReference(
+    collectionName: adminUsersCollection,
+    documentId: userId,
   );
   //endregion
 
-  //region About Document
-  static const String aboutDocument = "about";
+  //region Catering Collection
+  static const String cateringCollection = 'catering';
 
-  static MyFirestoreDocumentReference get adminAboutDocumentReference => adminDocumentReference(
-    documentId: aboutDocument,
+  static MyFirestoreCollectionReference get cateringCollectionReference => FirestoreController.collectionReference(
+    collectionName: FirebaseNodes.cateringCollection,
+  );
+
+  static MyFirestoreDocumentReference cateringDocumentReference({String? cateringId}) => FirestoreController.documentReference(
+    collectionName: FirebaseNodes.cateringCollection,
+    documentId: cateringId,
   );
   //endregion
 
-  //region FAQ Document
-  static const String faqDocument = "faq";
+  //region PartyPlot Collection
+  static const String partyPlotCollection = 'partyPlot';
 
-  static MyFirestoreDocumentReference get adminFaqDocumentReference => adminDocumentReference(
-    documentId: faqDocument,
-  );
-  //endregion
-
-  //region Feedback Document
-  static const String feedbackDocument = "feedback";
-
-  static MyFirestoreDocumentReference get adminFeedbackDocumentReference => adminDocumentReference(
-    documentId: feedbackDocument,
-  );
-  //endregion
-  //endregion
-
-  //region Courses Collection
-  static const String coursesCollection = 'courses';
-
-  static MyFirestoreCollectionReference get coursesCollectionReference => FirestoreController.collectionReference(
-    collectionName: FirebaseNodes.coursesCollection,
+  static MyFirestoreCollectionReference get partyPlotCollectionReference => FirestoreController.collectionReference(
+    collectionName: FirebaseNodes.partyPlotCollection,
   );
 
-  static MyFirestoreDocumentReference coursesDocumentReference({String? courseId}) => FirestoreController.documentReference(
-    collectionName: FirebaseNodes.coursesCollection,
-    documentId: courseId,
+  static MyFirestoreDocumentReference partyPlotDocumentReference({String? partyPlotId}) => FirestoreController.documentReference(
+    collectionName: FirebaseNodes.partyPlotCollection,
+    documentId: partyPlotId,
   );
   //endregion
 
@@ -96,20 +77,11 @@ class SharePreferenceKeys {
   static const String appThemeMode = "themeMode";
 }
 
-class NotificationTypes {
-  static const String editCourse = "editCourse";
-  static const String courseValidityExtended = "courseValidityExtended";
-  static const String courseAssigned = "courseAssigned";
-  static const String courseExpired = "courseExpired";
-}
-
 class UIConstants {
   static const String noUserImageUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 }
 
 class AppAssets {
   static const String logo = 'assets/images/logo.png';
+  static const String googleLogo = 'assets/images/google.png';
 }
-
-String ISFIRST = "isfirst";
-String LAST_OPENED_TIME = "last_opened_time";

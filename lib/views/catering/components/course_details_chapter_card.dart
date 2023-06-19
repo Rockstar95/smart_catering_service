@@ -1,14 +1,8 @@
 import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_arguments.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_controller.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_operation_parameters.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_type.dart';
-import 'package:smart_catering_service/models/course/data_model/chapter_model.dart';
-import 'package:smart_catering_service/models/course/data_model/course_model.dart';
-import 'package:smart_catering_service/utils/extensions.dart';
+import 'package:smart_catering_service/models/course/data_model/catering_package_model.dart';
+import 'package:smart_catering_service/models/course/data_model/party_plot_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../../configs/styles.dart';
 import '../../common/components/common_cachednetwork_image.dart';
@@ -42,8 +36,7 @@ class _CourseDetailsChapterCardState extends State<CourseDetailsChapterCard> {
 
   void initialize({required ChapterModel chapterModel}) {
     this.chapterModel = chapterModel;
-    String? videoId = YoutubePlayer.convertUrlToId(widget.chapterModel.url);
-    thumbnailUrl = videoId.checkNotEmpty ? YoutubePlayer.getThumbnail(videoId: videoId!) : widget.chapterModel.thumbnailUrl;
+    thumbnailUrl = widget.chapterModel.thumbnailUrl;
   }
 
   @override
@@ -129,16 +122,7 @@ class _CourseDetailsChapterCardState extends State<CourseDetailsChapterCard> {
                 right: 6,
                 child: GestureDetector(
                   onTap: () {
-                    NavigationController.navigateToCoursePlayerScreen(
-                      navigationOperationParameters: NavigationOperationParameters(
-                        context: context,
-                        navigationType: NavigationType.pushNamed,
-                      ),
-                      arguments: CoursePlayerScreenNavigationArguments(
-                        chapterModel: widget.chapterModel,
-                        courseModel: widget.courseModel,
-                      ),
-                    );
+
                   },
                   child: Container(
                     padding: const EdgeInsets.all(4),

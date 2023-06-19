@@ -9,5 +9,5 @@ class AppController {
 
   AppController._();
 
-  static late bool isDev;
+  static late bool isAdminApp;
 }

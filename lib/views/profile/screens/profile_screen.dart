@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../../../backend/authentication/authentication_controller.dart';
 import '../../../backend/authentication/authentication_provider.dart';
+import '../../../backend/navigation/navigation_arguments.dart';
+import '../../../backend/navigation/navigation_controller.dart';
+import '../../../backend/navigation/navigation_operation_parameters.dart';
+import '../../../backend/navigation/navigation_type.dart';
 import '../../../configs/styles.dart';
 import '../../../models/user/data_model/user_model.dart';
 import '../../../utils/my_print.dart';
@@ -44,6 +48,23 @@ class _ProfileScreenState extends State<ProfileScreen> with MySafeState {
                   getProfileDetails(userModel),
                   Column(
                     children: <Widget>[
+                      singleOption1(
+                        iconData: Icons.edit_outlined,
+                        option: "Edit",
+                        ontap: () async {
+                          if (userModel != null) {
+                            await NavigationController.navigateToEditProfileScreen(
+                              navigationOperationParameters: NavigationOperationParameters(
+                                context: context,
+                                navigationType: NavigationType.pushNamed,
+                              ),
+                              arguments: EditProfileScreenNavigationArguments(userModel: userModel),
+                            );
+
+                            mySetState();
+                          }
+                        },
+                      ),
                       userModel != null
                           ? singleOption1(
                               iconData: Icons.logout,

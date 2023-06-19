@@ -20,7 +20,7 @@ import 'views/myapp-user.dart';
 Future<void>? runErrorSafeApp({required bool isAdminApp}) {
   return runZonedGuarded<Future<void>>(
     () async {
-      await initApp();
+      await initApp(isAdminApp: isAdminApp);
       runApp(
         isAdminApp ? const MyAppAdmin() : const MyAppUser(),
       );
@@ -34,9 +34,9 @@ Future<void>? runErrorSafeApp({required bool isAdminApp}) {
 }
 
 /// It provides initial initialisation the app and its global services
-Future<void> initApp() async {
+Future<void> initApp({required bool isAdminApp}) async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppController.isDev = true;
+  AppController.isAdminApp = isAdminApp;
 
   List<Future> futures = [];
 

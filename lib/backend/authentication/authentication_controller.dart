@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:smart_catering_service/backend/course/course_provider.dart';
 import 'package:smart_catering_service/utils/extensions.dart';
 import 'package:smart_catering_service/utils/my_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../configs/constants.dart';
 import '../../configs/typedefs.dart';
@@ -39,6 +37,9 @@ class AuthenticationController {
   AuthenticationRepository get authenticationRepository => _authenticationRepository;
 
   Future<bool> isUserLoggedIn() async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AuthenticationController().isUserLoggedIn() called", tag: tag);
+
     AuthenticationProvider provider = authenticationProvider;
 
     User? firebaseUser = await FirebaseAuth.instance.authStateChanges().first;
@@ -49,6 +50,8 @@ class AuthenticationController {
         firebaseUser = await FirebaseAuth.instance.authStateChanges().first;
       }
     }
+
+    MyPrint.printOnConsole("FirebaseUsr:$firebaseUser", tag: tag);
 
     if (firebaseUser != null && (firebaseUser.phoneNumber ?? "").isNotEmpty) {
       provider.setAuthenticationDataFromFirebaseUser(
@@ -114,7 +117,7 @@ class AuthenticationController {
     User? user = await authenticationRepository.signInWithGoogle(context: context);
     MyPrint.printOnConsole("user:$user", tag: tag);
 
-    provider.userId.set(value: user?.uid ?? "");
+    provider.setAuthenticationDataFromFirebaseUser(firebaseUser: user, isNotify: false);
 
     bool isUserExist = await checkUserWithIdExistOrNotAndIfNotExistThenCreate(
       userId: user?.uid ?? "",
@@ -129,7 +132,7 @@ class AuthenticationController {
   }
 
   //region User Stream Subscription
-  Future<void> startUserSubscription({required CourseProvider courseProvider}) async {
+  Future<void> startUserSubscription() async {
     MyPrint.printOnConsole("AuthenticationController().startUserSubscription() called");
 
     AuthenticationProvider provider = authenticationProvider;
@@ -230,8 +233,8 @@ class AuthenticationController {
     provider.resetData(isNotify: false);
 
     if (context != null && context.checkMounted() && context.mounted) {
-      CourseProvider courseProvider = context.read<CourseProvider>();
-      courseProvider.reset(isNotify: false);
+      // CourseProvider courseProvider = context.read<CourseProvider>();
+      // courseProvider.reset(isNotify: false);
     }
 
     try {

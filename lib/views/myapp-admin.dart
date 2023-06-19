@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../backend/app_theme/app_theme_provider.dart';
 import '../backend/authentication/authentication_provider.dart';
 import '../backend/connection/connection_provider.dart';
-import '../backend/course/course_provider.dart';
+import '../backend/course/catering_provider.dart';
 import '../backend/home_screen/home_screen_provider.dart';
 import '../backend/navigation/navigation_controller.dart';
 import '../utils/my_print.dart';

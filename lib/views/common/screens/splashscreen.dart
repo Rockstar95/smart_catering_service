@@ -1,6 +1,3 @@
-import 'package:smart_catering_service/backend/admin/admin_controller.dart';
-import 'package:smart_catering_service/backend/admin/admin_provider.dart';
-import 'package:smart_catering_service/backend/course/course_provider.dart';
 import 'package:smart_catering_service/configs/constants.dart';
 import 'package:smart_catering_service/models/user/data_model/user_model.dart';
 import 'package:smart_catering_service/utils/extensions.dart';
@@ -10,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../backend/authentication/authentication_controller.dart';
 import '../../../backend/authentication/authentication_provider.dart';
+import '../../../backend/navigation/navigation_arguments.dart';
 import '../../../backend/navigation/navigation_controller.dart';
 import '../../../backend/navigation/navigation_operation_parameters.dart';
 import '../../../backend/navigation/navigation_type.dart';
@@ -34,16 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     NavigationController.isFirst = false;
 
-    AdminProvider adminProvider = context.read<AdminProvider>();
     AuthenticationProvider authenticationProvider = context.read<AuthenticationProvider>();
-    CourseProvider courseProvider = context.read<CourseProvider>();
-
-    AdminController adminController = AdminController(adminProvider: adminProvider);
-    await Future.wait([
-      adminController.getPropertyModelAndSaveInProvider(),
-      adminController.getNewTimestampAndSaveInProvider(),
-    ]);
-
     AuthenticationController authenticationController = AuthenticationController(authenticationProvider: authenticationProvider);
 
     bool isUserLoggedIn = await authenticationController.isUserLoggedIn();
@@ -64,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isExist = await authenticationController.checkUserWithIdExistOrNotAndIfNotExistThenCreate(userId: authenticationProvider.userId.get());
     MyPrint.printOnConsole("isExist:$isExist", tag: tag);
 
-    await authenticationController.startUserSubscription(courseProvider: courseProvider);
+    await authenticationController.startUserSubscription();
     UserModel? userModel = authenticationProvider.userModel.get();
 
     if (context.checkMounted() && context.mounted) {
@@ -77,13 +66,27 @@ class _SplashScreenState extends State<SplashScreen> {
         );
         return;
       }
-
-      NavigationController.navigateToHomeScreen(
-        navigationOperationParameters: NavigationOperationParameters(
-          context: context,
-          navigationType: NavigationType.pushNamedAndRemoveUntil,
-        ),
-      );
+      else if(userModel.name.isEmpty) {
+        NavigationController.navigateToEditProfileScreen(
+          navigationOperationParameters: NavigationOperationParameters(
+            context: context,
+            navigationType: NavigationType.pushNamedAndRemoveUntil,
+          ),
+          arguments: EditProfileScreenNavigationArguments(
+            userModel: userModel,
+            isSignUp: true,
+          ),
+        );
+        return;
+      }
+      else {
+        NavigationController.navigateToHomeScreen(
+          navigationOperationParameters: NavigationOperationParameters(
+            context: context,
+            navigationType: NavigationType.pushNamedAndRemoveUntil,
+          ),
+        );
+      }
     }
   }
 
