@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_catering_service/views/catering/screens/add_edit_admin_catering_package_screen.dart';
 
 import '../../utils/my_print.dart';
 import '../../views/admin_registration/screens/admin_registration_screen.dart';
 import '../../views/authentication/screens/login_screen.dart';
+import '../../views/catering/screens/add_edit_admin_catering_screen.dart';
 import '../../views/common/screens/splashscreen.dart';
 import '../../views/homescreen/screens/admin_homescreen.dart';
 import '../../views/homescreen/screens/user_homescreen.dart';
@@ -95,6 +97,16 @@ class NavigationController {
       case AdminHomeScreen.routeName:
         {
           page = parseAdminHomeScreen(settings: settings);
+          break;
+        }
+      case AddEditAdminCateringScreen.routeName:
+        {
+          page = parseAddEditAdminCateringScreen(settings: settings);
+          break;
+        }
+      case AddEditAdminCateringPackageScreen.routeName:
+        {
+          page = parseAddEditAdminCateringPackageScreen(settings: settings);
           break;
         }
     }
@@ -207,6 +219,16 @@ class NavigationController {
     return const UserHomeScreen();
   }
 
+  static Widget? parseAddEditAdminCateringScreen({required RouteSettings settings}) {
+    return const AddEditAdminCateringScreen();
+  }
+
+  static Widget? parseAddEditAdminCateringPackageScreen({required RouteSettings settings}) {
+    dynamic argument = settings.arguments;
+    if (argument is! AddEditAdminCateringPackageScreenNavigationArguments) return null;
+    return AddEditAdminCateringPackageScreen(arguments: argument);
+  }
+
   //endregion
 
   //region Navigation Methods
@@ -248,5 +270,24 @@ class NavigationController {
       routeName: UserHomeScreen.routeName,
     ));
   }
-  //endregion
+
+  static Future<dynamic> navigateToAddEditAdminCateringScreen({required NavigationOperationParameters navigationOperationParameters}) {
+    return NavigationOperation.navigate(
+        navigationOperationParameters: navigationOperationParameters.copyWith(
+      routeName: AddEditAdminCateringScreen.routeName,
+    ));
+  }
+
+  static Future<dynamic> navigateToAddEditAdminCateringPackageScreen({
+    required NavigationOperationParameters navigationOperationParameters,
+    required AddEditAdminCateringPackageScreenNavigationArguments arguments,
+  }) {
+    return NavigationOperation.navigate(
+      navigationOperationParameters: navigationOperationParameters.copyWith(
+        routeName: AddEditAdminCateringPackageScreen.routeName,
+        arguments: arguments,
+      ),
+    );
+  }
+//endregion
 }

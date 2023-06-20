@@ -7,6 +7,8 @@ import 'package:smart_catering_service/models/admin_user/data_model/admin_user_m
 import 'package:smart_catering_service/models/user/data_model/user_model.dart';
 import 'package:smart_catering_service/utils/extensions.dart';
 
+import '../../../backend/admin_user/admin_user_controller.dart';
+import '../../../backend/admin_user/admin_user_provider.dart';
 import '../../../backend/authentication/authentication_controller.dart';
 import '../../../backend/authentication/authentication_provider.dart';
 import '../../../backend/navigation/navigation_arguments.dart';
@@ -56,6 +58,20 @@ class _SplashScreenState extends State<SplashScreen> {
     MyPrint.printOnConsole("isExist:$isExist", tag: tag);
 
     await authenticationController.startUserSubscription();
+
+    if (context.checkMounted() && context.mounted) {
+      if(AppController.isAdminApp) {
+        AdminUserController adminUserController = AdminUserController(
+          authenticationProvider: authenticationProvider,
+          adminUserProvider: context.read<AdminUserProvider>(),
+        );
+
+        await Future.wait([
+          adminUserController.initializeCateringModel(cateringId: authenticationProvider.userId.get()),
+          adminUserController.initializePartyPlotModel(partyPlotId: authenticationProvider.userId.get()),
+        ]);
+      }
+    }
 
     if (context.checkMounted() && context.mounted) {
       if(AppController.isAdminApp) {

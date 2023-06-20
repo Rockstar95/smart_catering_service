@@ -2,6 +2,7 @@ import 'package:smart_catering_service/models/admin_user/data_model/admin_user_m
 import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
 
 import '../../models/user/data_model/user_model.dart';
+import '../../views/catering/screens/add_edit_admin_catering_screen.dart';
 
 class NavigationArguments {
   const NavigationArguments();
@@ -38,5 +39,13 @@ class CateringDetailsScreenNavigationArguments extends NavigationArguments {
 
   const CateringDetailsScreenNavigationArguments({
     required this.cateringModel,
+  });
+}
+
+class AddEditAdminCateringPackageScreenNavigationArguments extends NavigationArguments {
+  final CateringPackageModelTemp? cateringPackageModelTemp;
+
+  const AddEditAdminCateringPackageScreenNavigationArguments({
+    required this.cateringPackageModelTemp,
   });
 }

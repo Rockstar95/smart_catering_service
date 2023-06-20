@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_catering_service/backend/admin_user/admin_user_controller.dart';
+import 'package:smart_catering_service/backend/admin_user/admin_user_provider.dart';
 import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
 import 'package:smart_catering_service/backend/common/app_controller.dart';
 import 'package:smart_catering_service/backend/navigation/navigation_arguments.dart';
@@ -44,6 +46,22 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
     bool isLoggedIn = await authenticationController.signInWithGoogle(context: context);
     MyPrint.printOnConsole("isLoggedIn:$isLoggedIn");
 
+    if (isLoggedIn) {
+      if (context.checkMounted() && context.mounted) {
+        if (AppController.isAdminApp) {
+          AdminUserController adminUserController = AdminUserController(
+            authenticationProvider: authenticationProvider,
+            adminUserProvider: context.read<AdminUserProvider>(),
+          );
+
+          await Future.wait([
+            adminUserController.initializeCateringModel(cateringId: authenticationProvider.userId.get()),
+            adminUserController.initializePartyPlotModel(partyPlotId: authenticationProvider.userId.get()),
+          ]);
+        } else {}
+      }
+    }
+
     isLoading = false;
     mySetState();
 
@@ -51,17 +69,16 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
       await authenticationController.startUserSubscription();
 
       if (context.checkMounted() && context.mounted) {
-        if(AppController.isAdminApp) {
+        if (AppController.isAdminApp) {
           AdminUserModel? adminUserModel = authenticationProvider.adminUserModel.get();
-          if(adminUserModel == null) {
+          if (adminUserModel == null) {
             NavigationController.navigateToLoginScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,
                 navigationType: NavigationType.pushNamedAndRemoveUntil,
               ),
             );
-          }
-          else if(!adminUserModel.isProfileSet) {
+          } else if (!adminUserModel.isProfileSet) {
             NavigationController.navigateToAdminRegistrationScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,
@@ -69,8 +86,7 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
               ),
               arguments: AdminRegistrationScreenNavigationArguments(adminUserModel: adminUserModel),
             );
-          }
-          else {
+          } else {
             NavigationController.navigateToAdminHomeScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,
@@ -78,18 +94,16 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
               ),
             );
           }
-        }
-        else {
+        } else {
           UserModel? userModel = authenticationProvider.userModel.get();
-          if(userModel == null) {
+          if (userModel == null) {
             NavigationController.navigateToLoginScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,
                 navigationType: NavigationType.pushNamedAndRemoveUntil,
               ),
             );
-          }
-          else if(userModel.name.isEmpty) {
+          } else if (userModel.name.isEmpty) {
             NavigationController.navigateToUserEditProfileScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,
@@ -100,8 +114,7 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
                 isSignUp: true,
               ),
             );
-          }
-          else {
+          } else {
             NavigationController.navigateToUserHomeScreen(
               navigationOperationParameters: NavigationOperationParameters(
                 context: context,

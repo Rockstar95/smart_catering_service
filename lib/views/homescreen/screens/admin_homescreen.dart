@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
 import 'package:smart_catering_service/backend/catering/catering_provider.dart';
+import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
 
 import '../../../backend/home_screen/home_screen_provider.dart';
 import '../../../configs/styles.dart';
 import '../../../utils/my_print.dart';
 import '../../../utils/my_safe_state.dart';
-import '../../profile/screens/profile_screen.dart';
+import '../../profile/screens/admin_profile_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   static const String routeName = "/AdminHomeScreen";
@@ -20,27 +22,30 @@ class AdminHomeScreen extends StatefulWidget {
   State<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
 
-class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProviderStateMixin, MySafeState {
+class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderStateMixin, MySafeState {
   int _currentIndex = 0;
-  late TabController _tabController;
+  TabController? _tabController;
 
   late HomeScreenProvider homeScreenProvider;
 
   Widget? cateringScreenWidget, myCoursesListScreenWidget, profileWidget;
+
+  bool isCateringEnabled = false;
+  bool isPartyPlotEnabled = false;
 
   //region Tab Handling
   _handleTabSelection() {
     FocusScope.of(context).requestFocus(FocusNode());
 
     MyPrint.printOnConsole("_handleTabSelection called");
-    _currentIndex = _tabController.index;
-    homeScreenProvider.homeTabIndex.set(value: _tabController.index, isNotify: true);
+    _currentIndex = _tabController?.index ?? 0;
+    homeScreenProvider.homeTabIndex.set(value: _tabController?.index ?? 0, isNotify: true);
 
     //if(_currentIndex == 1 && Provider.of<ProductProvider>(context, listen: false).searchedProductsList == null) ProductController().getProducts(context, true, withnotifying: false);
   }
 
   _handleTabSelectionInAnimation() {
-    final aniValue = _tabController.animation?.value ?? 0;
+    final aniValue = _tabController?.animation?.value ?? 0;
     //MyPrint.printOnConsole("Animation Value:$aniValue");
     //MyPrint.printOnConsole("Current Value:$_currentIndex");
 
@@ -66,46 +71,77 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
 
   late CateringProvider cateringProvider;
 
+  void initializeTabControllerFromAdminUserModel({AdminUserModel? adminUserModel}) {
+    int count = 1;
+    isCateringEnabled = adminUserModel?.isCateringEnabled ?? false;
+    isPartyPlotEnabled = adminUserModel?.isPartyPlotEnabled ?? false;
+    if(isCateringEnabled) count++;
+    if(isPartyPlotEnabled) count++;
+
+    if(count > 1) {
+      if(_tabController != null && _tabController!.length == count) return;
+
+      _tabController = TabController(length: count, vsync: this, initialIndex: 0);
+      _tabController!.addListener(_handleTabSelection);
+      _tabController!.animation?.addListener(_handleTabSelectionInAnimation);
+    }
+    else {
+      if(_tabController == null) return;
+
+      _tabController = null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
-    _tabController.addListener(_handleTabSelection);
-    _tabController.animation?.addListener(_handleTabSelectionInAnimation);
-
     cateringProvider = context.read<CateringProvider>();
+    // AuthenticationProvider authenticationProvider = context.read<AuthenticationProvider>();
+    // initializeTabControllerFromAdminUserModel(adminUserModel: authenticationProvider.adminUserModel.get());
   }
 
   @override
   Widget build(BuildContext context) {
     super.pageBuild();
 
-    return Consumer(
-      builder: (BuildContext context, HomeScreenProvider homeScreenProvider, Widget? child) {
+    return Consumer2<HomeScreenProvider, AuthenticationProvider>(
+      builder: (BuildContext context, HomeScreenProvider homeScreenProvider, AuthenticationProvider authenticationProvider, Widget? child) {
         this.homeScreenProvider = homeScreenProvider;
+
+        initializeTabControllerFromAdminUserModel(adminUserModel: authenticationProvider.adminUserModel.get());
 
         return Container(
           color: themeData.colorScheme.background,
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             bottomNavigationBar: getBottomBar(homeScreenProvider),
-            body: TabBarView(
-              controller: _tabController,
-              children: <Widget>[
-                getCateringScreen(),
-                getPartyPlotScreen(),
-                getUserProfile(),
-              ],
-            ),
+            body: getMainBody(),
           ),
         );
       },
     );
   }
 
+  Widget getMainBody() {
+    if(_tabController == null) {
+      return getAdminUserProfile();
+    }
+
+    return TabBarView(
+      controller: _tabController,
+      children: <Widget>[
+        if(isCateringEnabled) getCateringScreen(),
+        if(isPartyPlotEnabled) getPartyPlotScreen(),
+        getAdminUserProfile(),
+      ],
+    );
+  }
+
   //region Bottom Navigation Section
-  Widget getBottomBar(HomeScreenProvider homeScreenProvider) {
+  Widget? getBottomBar(HomeScreenProvider homeScreenProvider) {
+    if(_tabController == null) return null;
+
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -147,8 +183,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
               fontWeight: FontWeight.w700,
               fontSize: 11,
             ),
-            tabs:  const <Widget>[
-              Tab(
+            tabs: <Widget>[
+              if(isCateringEnabled) const Tab(
                 icon: Icon(
                   Icons.emoji_food_beverage_rounded,
                   size: 20,
@@ -156,12 +192,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                 iconMargin: EdgeInsets.symmetric(horizontal: 0, vertical: 2),
                 text: "Catering",
               ),
-              Tab(
+              if(isPartyPlotEnabled) const Tab(
                 icon: Icon(Icons.business,size: 20),
                 iconMargin: EdgeInsets.symmetric(horizontal: 0, vertical: 2),
                 text: "Party Plot",
               ),
-              Tab(
+              const Tab(
                 icon: Icon(
                   MdiIcons.account,
                   size: 20,
@@ -217,8 +253,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
     return myCoursesListScreenWidget!;
   }
 
-  Widget getUserProfile() {
-    profileWidget ??= const ProfileScreen();
+  Widget getAdminUserProfile() {
+    profileWidget ??= const AdminProfileScreen();
 
     return profileWidget!;
   }

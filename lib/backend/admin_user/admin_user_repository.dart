@@ -1,9 +1,11 @@
 import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
 import 'package:smart_catering_service/models/admin_user/request_model/admin_user_update_request_model.dart';
+import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
 
 import '../../configs/constants.dart';
 import '../../configs/typedefs.dart';
 import '../../models/common/data_model/new_document_data_model.dart';
+import '../../models/party_plot/data_model/party_plot_model.dart';
 import '../../utils/my_print.dart';
 import '../../utils/my_utils.dart';
 
@@ -94,5 +96,90 @@ class AdminUserRepository {
     MyPrint.printOnConsole("isUpdated:'$isUpdated'", tag: tag);
 
     return isUpdated;
+  }
+
+  Future<CateringModel?> getCateringModelFromId({required String id}) async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AdminUserRepository().getCateringModelFromId() called with id:'$id'", tag: tag);
+
+    if (id.isEmpty) {
+      MyPrint.printOnConsole("Returning from AdminUserRepository().getCateringModelFromId() because id is empty", tag: tag);
+      return null;
+    }
+
+    try {
+      MyFirestoreDocumentSnapshot snapshot = await FirebaseNodes.cateringDocumentReference(cateringId: id).get();
+      MyPrint.printOnConsole("snapshot.exists:'${snapshot.exists}'", tag: tag);
+      MyPrint.printOnConsole("snapshot.data():'${snapshot.data()}'", tag: tag);
+
+      if (snapshot.exists && (snapshot.data()?.isNotEmpty ?? false)) {
+        return CateringModel.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e, s) {
+      MyPrint.printOnConsole("Error in AdminUserRepository().getCateringModelFromId():'$e'", tag: tag);
+      MyPrint.printOnConsole(s, tag: tag);
+      return null;
+    }
+  }
+
+  Future<PartyPlotModel?> getPartyPlotModelFromId({required String id}) async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AdminUserRepository().getPartyPlotModelFromId() called with id:'$id'", tag: tag);
+
+    if (id.isEmpty) {
+      MyPrint.printOnConsole("Returning from AdminUserRepository().getPartyPlotModelFromId() because id is empty", tag: tag);
+      return null;
+    }
+
+    try {
+      MyFirestoreDocumentSnapshot snapshot = await FirebaseNodes.partyPlotDocumentReference(partyPlotId: id).get();
+      MyPrint.printOnConsole("snapshot.exists:'${snapshot.exists}'", tag: tag);
+      MyPrint.printOnConsole("snapshot.data():'${snapshot.data()}'", tag: tag);
+
+      if (snapshot.exists && (snapshot.data()?.isNotEmpty ?? false)) {
+        return PartyPlotModel.fromMap(snapshot.data()!);
+      } else {
+        return null;
+      }
+    } catch (e, s) {
+      MyPrint.printOnConsole("Error in AdminUserRepository().getPartyPlotModelFromId():'$e'", tag: tag);
+      MyPrint.printOnConsole(s, tag: tag);
+      return null;
+    }
+  }
+
+  Future<bool> setCateringModelInId({required String id, required CateringModel cateringModel}) async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AdminUserRepository().setCateringModelInId() called with id:'$id', cateringModel:'$cateringModel'", tag: tag);
+
+    if (id.isEmpty) {
+      MyPrint.printOnConsole("Returning from AdminUserRepository().setCateringModelInId() because id is empty", tag: tag);
+      return false;
+    }
+
+    NewDocumentDataModel newDocumentDataModel = await MyUtils.getNewDocIdAndTimeStamp(isGetTimeStamp: true);
+    if(cateringModel.id.isEmpty) {
+      cateringModel.id = id;
+      cateringModel.createdTime = newDocumentDataModel.timestamp;
+    }
+    else {
+      cateringModel.updatedTime = newDocumentDataModel.timestamp;
+    }
+    if(cateringModel.createdTime == null) {
+      cateringModel.createdTime = newDocumentDataModel.timestamp;
+    }
+
+    try {
+      await FirebaseNodes.cateringDocumentReference(cateringId: cateringModel.id).set(cateringModel.toMap());
+      MyPrint.printOnConsole("Catering Document Updated", tag: tag);
+
+      return true;
+    } catch (e, s) {
+      MyPrint.printOnConsole("Error in AdminUserRepository().setCateringModelInId():'$e'", tag: tag);
+      MyPrint.printOnConsole(s, tag: tag);
+      return false;
+    }
   }
 }

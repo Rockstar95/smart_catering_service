@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/admin_user/admin_user_controller.dart';
+import 'package:smart_catering_service/backend/admin_user/admin_user_provider.dart';
 import 'package:smart_catering_service/backend/common/app_controller.dart';
 import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
 import 'package:smart_catering_service/utils/extensions.dart';
@@ -287,7 +289,12 @@ class AuthenticationController {
     stopUserSubscription();
 
     if (context != null && context.checkMounted() && context.mounted) {
-      // CourseProvider courseProvider = context.read<CourseProvider>();
+      if(AppController.isAdminApp) {
+        context.read<AdminUserProvider>().reset(isNotify: false);
+      }
+      else {
+
+      }
       // courseProvider.reset(isNotify: false);
     }
 

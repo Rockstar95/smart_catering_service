@@ -6,6 +6,7 @@ class CommonProvider extends ChangeNotifier {
   }
 }
 
+typedef NewPrimitiveInstancialization<T> = T Function(T);
 typedef NewListInstancialization<T> = T Function(T);
 typedef NewMapInstancialization<K, V> = MapEntry<K, V> Function(MapEntry<K, V>);
 
@@ -85,7 +86,7 @@ class CommonProviderMapParameter<K, V> {
 
   int get length => _map.length;
 
-  Map<K, V> getMap({bool isNewInstance = true, }) {
+  Map<K, V> getMap({bool isNewInstance = true}) {
     if(isNewInstance) {
       return _map.map((K key, V value) {
         MapEntry<K, V> mapEntry = MapEntry<K, V>(key, value);
@@ -112,23 +113,36 @@ class CommonProviderMapParameter<K, V> {
 
 class CommonProviderPrimitiveParameter<T> {
   late void Function({bool isNotify}) _notify;
+  NewPrimitiveInstancialization<T>? _newInstancialization;
 
   CommonProviderPrimitiveParameter({
     required T value,
     required void Function({bool isNotify}) notify,
+    NewPrimitiveInstancialization<T>? newInstancialization,
   }) {
     _notify = notify;
+    _newInstancialization = newInstancialization;
     set(value: value, isNotify: false);
   }
 
   late T _value;
 
-  T get() {
-    return _value;
+  T get({bool isNewInstance = true}) {
+    if(isNewInstance && _newInstancialization != null) {
+      return _newInstancialization!(_value);
+    }
+    else {
+      return _value;
+    }
   }
 
-  void set({required T value, bool isNotify = true}) {
-    _value = value;
+  void set({required T value, bool isNewInstance = true, bool isNotify = true}) {
+    if(isNewInstance && _newInstancialization != null) {
+      _value = _newInstancialization!(value);
+    }
+    else {
+      _value = value;
+    }
     _notify(isNotify: isNotify);
   }
 }

@@ -61,11 +61,7 @@ class _UserEditProfileScreenState extends State<UserEditProfileScreen> with MySa
         sourcePath: platformFile.path!,
         cropStyle: CropStyle.rectangle,
         aspectRatioPresets: [
-          CropAspectRatioPreset.original,
           CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9,
         ],
         uiSettings: [
           AndroidUiSettings(

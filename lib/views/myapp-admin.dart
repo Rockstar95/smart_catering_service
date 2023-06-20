@@ -3,6 +3,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/catering/catering_provider.dart';
 
+import '../backend/admin_user/admin_user_provider.dart';
 import '../backend/app_theme/app_theme_provider.dart';
 import '../backend/authentication/authentication_provider.dart';
 import '../backend/connection/connection_provider.dart';
@@ -24,6 +25,7 @@ class MyAppAdmin extends StatelessWidget {
         ChangeNotifierProvider<ConnectionProvider>(create: (_) => ConnectionProvider(), lazy: false),
         ChangeNotifierProvider<CateringProvider>(create: (_) => CateringProvider(), lazy: false),
         ChangeNotifierProvider<HomeScreenProvider>(create: (_) => HomeScreenProvider(), lazy: false),
+        ChangeNotifierProvider<AdminUserProvider>(create: (_) => AdminUserProvider(), lazy: false),
       ],
       child: const MainAppAdmin(),
     );
