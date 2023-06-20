@@ -5,6 +5,9 @@ class AppConstants {
   static const int cateringsDocumentLimitForPagination = 10;
   static const int cateringsRefreshLimitForPagination = 3;
 
+  static const int partyPlotsDocumentLimitForPagination = 10;
+  static const int partyPlotsRefreshLimitForPagination = 3;
+
   static const Map<String, List<String>> cityAreaMap = {
     "Vadodara" : [
       "Akota",

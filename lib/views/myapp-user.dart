@@ -8,6 +8,7 @@ import '../backend/catering/catering_provider.dart';
 import '../backend/connection/connection_provider.dart';
 import '../backend/home_screen/home_screen_provider.dart';
 import '../backend/navigation/navigation_controller.dart';
+import '../backend/party_plot/party_plot_provider.dart';
 import '../utils/my_print.dart';
 
 class MyAppUser extends StatelessWidget {
@@ -23,6 +24,7 @@ class MyAppUser extends StatelessWidget {
         ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider(), lazy: false),
         ChangeNotifierProvider<ConnectionProvider>(create: (_) => ConnectionProvider(), lazy: false),
         ChangeNotifierProvider<CateringProvider>(create: (_) => CateringProvider(), lazy: false),
+        ChangeNotifierProvider<PartyPlotProvider>(create: (_) => PartyPlotProvider(), lazy: false),
         ChangeNotifierProvider<HomeScreenProvider>(create: (_) => HomeScreenProvider(), lazy: false),
       ],
       child: const MainAppUser(),

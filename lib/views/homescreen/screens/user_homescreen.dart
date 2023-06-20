@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/catering/catering_provider.dart';
+import 'package:smart_catering_service/backend/party_plot/party_plot_provider.dart';
+import 'package:smart_catering_service/views/catering/screens/user_catering_list_screen.dart';
+import 'package:smart_catering_service/views/party_plot/screens/user_party_plot_list_screen.dart';
 
 import '../../../backend/home_screen/home_screen_provider.dart';
 import '../../../configs/styles.dart';
@@ -26,7 +29,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> with SingleTickerProvid
 
   late HomeScreenProvider homeScreenProvider;
 
-  Widget? cateringScreenWidget, myCoursesListScreenWidget, profileWidget;
+  Widget? cateringScreenWidget, partyPlotsListScreenWidget, profileWidget;
 
   //region Tab Handling
   _handleTabSelection() {
@@ -65,6 +68,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> with SingleTickerProvid
   //endregion
 
   late CateringProvider cateringProvider;
+  late PartyPlotProvider partyPlotProvider;
 
   @override
   void initState() {
@@ -75,6 +79,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> with SingleTickerProvid
     _tabController.animation?.addListener(_handleTabSelectionInAnimation);
 
     cateringProvider = context.read<CateringProvider>();
+    partyPlotProvider = context.read<PartyPlotProvider>();
   }
 
   @override
@@ -202,19 +207,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> with SingleTickerProvid
   //endregion
 
   Widget getCateringScreen() {
-    cateringScreenWidget ??= const Center(
-      child: Text("Enquiry"),
-    );
+    cateringScreenWidget ??= UserCateringListScreen(cateringProvider: cateringProvider);
 
     return cateringScreenWidget!;
   }
 
   Widget getPartyPlotScreen() {
-    myCoursesListScreenWidget ??= const Center(
-      child: Text("Enquiry"),
-    );
+    partyPlotsListScreenWidget ??= UserPartyPlotListScreen(partyPlotProvider: partyPlotProvider);
 
-    return myCoursesListScreenWidget!;
+    return partyPlotsListScreenWidget!;
   }
 
   Widget getUserProfile() {
