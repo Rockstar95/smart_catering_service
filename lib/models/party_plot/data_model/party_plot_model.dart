@@ -71,8 +71,8 @@ class PartyPlotModel {
       "minPeople" : minPeople,
       "maxPeople" : maxPeople,
       "enabled" : enabled,
-      "createdTime" : createdTime,
-      "updatedTime" : updatedTime,
+      "createdTime" : toJson ? createdTime?.millisecondsSinceEpoch : createdTime,
+      "updatedTime" : toJson ? updatedTime?.millisecondsSinceEpoch : updatedTime,
       "photos" : photos,
     };
   }

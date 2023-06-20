@@ -65,8 +65,8 @@ class CateringModel {
       "description" : description,
       "thumbnailUrl" : thumbnailUrl,
       "enabled" : enabled,
-      "createdTime" : createdTime,
-      "updatedTime" : updatedTime,
+      "createdTime" : toJson ? createdTime?.millisecondsSinceEpoch : createdTime,
+      "updatedTime" : toJson ? updatedTime?.millisecondsSinceEpoch : updatedTime,
       "packages" : packages.map((e) => e.toMap(toJson: toJson)).toList(),
       "photos" : photos,
     };

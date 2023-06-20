@@ -60,7 +60,14 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> with MySafeStat
                     singleOption1(
                       iconData: Icons.business,
                       option: "Party Plot",
-                      ontap: () async {},
+                      ontap: () async {
+                        NavigationController.navigateToAddEditAdminPartyPlotScreen(
+                          navigationOperationParameters: NavigationOperationParameters(
+                            context: context,
+                            navigationType: NavigationType.pushNamed,
+                          ),
+                        );
+                      },
                     ),
                   adminUserModel != null
                       ? singleOption1(

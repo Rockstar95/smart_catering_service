@@ -167,9 +167,7 @@ class AdminUserRepository {
     else {
       cateringModel.updatedTime = newDocumentDataModel.timestamp;
     }
-    if(cateringModel.createdTime == null) {
-      cateringModel.createdTime = newDocumentDataModel.timestamp;
-    }
+    cateringModel.createdTime ??= newDocumentDataModel.timestamp;
 
     try {
       await FirebaseNodes.cateringDocumentReference(cateringId: cateringModel.id).set(cateringModel.toMap());
@@ -178,6 +176,37 @@ class AdminUserRepository {
       return true;
     } catch (e, s) {
       MyPrint.printOnConsole("Error in AdminUserRepository().setCateringModelInId():'$e'", tag: tag);
+      MyPrint.printOnConsole(s, tag: tag);
+      return false;
+    }
+  }
+
+  Future<bool> setPartyPlotModelInId({required String id, required PartyPlotModel partyPlotModel}) async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AdminUserRepository().setPartyPlotModelInId() called with id:'$id', partyPlotModel:'$partyPlotModel'", tag: tag);
+
+    if (id.isEmpty) {
+      MyPrint.printOnConsole("Returning from AdminUserRepository().setPartyPlotModelInId() because id is empty", tag: tag);
+      return false;
+    }
+
+    NewDocumentDataModel newDocumentDataModel = await MyUtils.getNewDocIdAndTimeStamp(isGetTimeStamp: true);
+    if(partyPlotModel.id.isEmpty) {
+      partyPlotModel.id = id;
+      partyPlotModel.createdTime = newDocumentDataModel.timestamp;
+    }
+    else {
+      partyPlotModel.updatedTime = newDocumentDataModel.timestamp;
+    }
+    partyPlotModel.createdTime ??= newDocumentDataModel.timestamp;
+
+    try {
+      await FirebaseNodes.partyPlotDocumentReference(partyPlotId: partyPlotModel.id).set(partyPlotModel.toMap());
+      MyPrint.printOnConsole("Catering Document Updated", tag: tag);
+
+      return true;
+    } catch (e, s) {
+      MyPrint.printOnConsole("Error in AdminUserRepository().setPartyPlotModelInId():'$e'", tag: tag);
       MyPrint.printOnConsole(s, tag: tag);
       return false;
     }

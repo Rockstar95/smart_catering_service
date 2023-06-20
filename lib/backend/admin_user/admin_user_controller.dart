@@ -98,7 +98,7 @@ class AdminUserController {
 
   Future<bool> updateCateringModel({required String cateringId, required CateringModel cateringModel}) async {
     String tag = MyUtils.getNewId();
-    MyPrint.printOnConsole("AdminUserController().initializeCateringModel() called", tag: tag);
+    MyPrint.printOnConsole("AdminUserController().updateCateringModel() called with cateringId:'$cateringId', cateringModel:$cateringModel", tag: tag);
 
     try {
       bool isSet = await adminUserRepository.setCateringModelInId(id: cateringId, cateringModel: cateringModel);
@@ -110,7 +110,28 @@ class AdminUserController {
 
       return isSet;
     } catch (e, s) {
-      MyPrint.printOnConsole("Error in AdminUserController().initializeCateringModel():$e", tag: tag);
+      MyPrint.printOnConsole("Error in AdminUserController().updateCateringModel():$e", tag: tag);
+      MyPrint.printOnConsole(s, tag: tag);
+    }
+
+    return false;
+  }
+
+  Future<bool> updatePartyPlotModel({required String partyPlotId, required PartyPlotModel partyPlotModel}) async {
+    String tag = MyUtils.getNewId();
+    MyPrint.printOnConsole("AdminUserController().updatePartyPlotModel() called with partyPlotId:'$partyPlotId', partyPlotModel:$partyPlotModel", tag: tag);
+
+    try {
+      bool isSet = await adminUserRepository.setPartyPlotModelInId(id: partyPlotId, partyPlotModel: partyPlotModel);
+      MyPrint.printOnConsole("isSet:$isSet", tag: tag);
+
+      if(isSet) {
+        adminUserProvider.partyPlotModel.set(value: partyPlotModel, isNewInstance: true);
+      }
+
+      return isSet;
+    } catch (e, s) {
+      MyPrint.printOnConsole("Error in AdminUserController().updatePartyPlotModel():$e", tag: tag);
       MyPrint.printOnConsole(s, tag: tag);
     }
 

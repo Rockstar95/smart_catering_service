@@ -8,15 +8,10 @@ import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/admin_user/admin_user_controller.dart';
 import 'package:smart_catering_service/backend/admin_user/admin_user_provider.dart';
 import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_arguments.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_controller.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_operation_parameters.dart';
-import 'package:smart_catering_service/backend/navigation/navigation_type.dart';
-import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
-import 'package:smart_catering_service/models/catering/data_model/catering_package_model.dart';
+import 'package:smart_catering_service/configs/constants.dart';
+import 'package:smart_catering_service/models/party_plot/data_model/party_plot_model.dart';
 import 'package:smart_catering_service/utils/extensions.dart';
 import 'package:smart_catering_service/utils/my_safe_state.dart';
-import 'package:smart_catering_service/utils/my_utils.dart';
 import 'package:smart_catering_service/views/common/components/modal_progress_hud.dart';
 
 import '../../../utils/my_print.dart';
@@ -25,16 +20,16 @@ import '../../common/components/common_cachednetwork_image.dart';
 import '../../common/components/common_submit_button.dart';
 import '../../profile/componants/profile_text_form_field.dart';
 
-class AddEditAdminCateringScreen extends StatefulWidget {
-  static const String routeName = "/AddEditAdminCateringScreen";
+class AddEditAdminPartyPlotScreen extends StatefulWidget {
+  static const String routeName = "/AddEditAdminPartyPlotScreen";
 
-  const AddEditAdminCateringScreen({super.key});
+  const AddEditAdminPartyPlotScreen({super.key});
 
   @override
-  State<AddEditAdminCateringScreen> createState() => _AddEditAdminCateringScreenState();
+  State<AddEditAdminPartyPlotScreen> createState() => _AddEditAdminPartyPlotScreenState();
 }
 
-class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen> with MySafeState {
+class _AddEditAdminPartyPlotScreenState extends State<AddEditAdminPartyPlotScreen> with MySafeState {
   bool isLoading = false;
 
   late AdminUserProvider adminUserProvider;
@@ -49,34 +44,32 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
   String? thumbnailImageUrl;
   List<String> filesToDelete = [];
 
-  List<CateringPhotoModel> photos = <CateringPhotoModel>[];
-  List<CateringPackageModelTemp> packages = <CateringPackageModelTemp>[];
+  List<PartyPlotPhotoModel> photos = <PartyPlotPhotoModel>[];
 
-  late CateringModel cateringModel;
+  String? locationArea;
+  String? locationCity;
 
-  void initializeFromModel({CateringModel? model}) {
-    cateringModel = model ?? CateringModel();
+  late PartyPlotModel partyPlotModel;
+
+  void initializeFromModel({PartyPlotModel? model}) {
+    partyPlotModel = model ?? PartyPlotModel();
 
     thumbnailImageUrl = "";
     thumbnailImageBytes = null;
 
-    titleController.text = cateringModel.title;
-    descriptionController.text = cateringModel.description;
-    thumbnailImageUrl = cateringModel.thumbnailUrl;
+    titleController.text = partyPlotModel.title;
+    descriptionController.text = partyPlotModel.description;
+    thumbnailImageUrl = partyPlotModel.thumbnailUrl;
     thumbnailImageBytes = null;
 
     photos.clear();
-    photos.addAll(cateringModel.photos.map((e) => CateringPhotoModel(imageUrl: e)));
+    photos.addAll(partyPlotModel.photos.map((e) => PartyPlotPhotoModel(imageUrl: e)));
 
-    packages.clear();
-    packages.addAll(cateringModel.packages.map((e) => CateringPackageModelTemp(
-          id: e.id,
-          title: e.title,
-          description: e.description,
-          thumbnailUrl: e.thumbnailUrl,
-          enabled: e.enabled,
-          price: e.price,
-        )));
+    locationArea = partyPlotModel.locationArea;
+    if (locationArea!.isEmpty) locationArea = null;
+
+    locationCity = partyPlotModel.locationCity;
+    if (locationCity!.isEmpty) locationCity = null;
 
     mySetState();
   }
@@ -161,23 +154,23 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
           MyPrint.printOnConsole("Cropped Image Path:${newImage.path}");
 
           Uint8List bytes = await newImage.readAsBytes();
-          photos.add(CateringPhotoModel(imageBytes: bytes));
+          photos.add(PartyPlotPhotoModel(imageBytes: bytes));
         }
       }
       mySetState();
     }
   }
 
-  Future<String> uploadThumbnailImage({required String cateringId, required Uint8List image}) async {
+  Future<String> uploadThumbnailImage({required String partyPlotId, required Uint8List image}) async {
     String downloadUrl = "";
 
-    if (cateringId.isEmpty) {
-      cateringId = "catering";
+    if (partyPlotId.isEmpty) {
+      partyPlotId = "catering";
     }
 
     // String fileName = file.path.substring(file.path.lastIndexOf("/") + 1);
     String fileName = "${DateTime.now().millisecondsSinceEpoch}.png";
-    Reference reference = FirebaseStorage.instance.ref().child("catering").child(cateringId).child("thumbnail").child(fileName);
+    Reference reference = FirebaseStorage.instance.ref().child("partyPlot").child(partyPlotId).child("thumbnail").child(fileName);
     UploadTask uploadTask = reference.putData(image);
 
     TaskSnapshot snapshot = await uploadTask.then((snapshot) => snapshot);
@@ -196,57 +189,18 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
     return downloadUrl;
   }
 
-  Future<List<CateringPackageModel>> uploadPackages({required String cateringId, required List<CateringPackageModelTemp> packages}) async {
-    List<CateringPackageModel> newPackages = [];
-
-    if (cateringId.isEmpty) {
-      cateringId = "catering";
-    }
-
-    for (CateringPackageModelTemp model in packages) {
-      String thumbnailImageUrl = model.thumbnailUrl;
-      if(model.thumbnailBytes != null) {
-        String fileName = "${DateTime.now().millisecondsSinceEpoch}.png";
-        Reference reference = FirebaseStorage.instance.ref().child("catering").child(cateringId).child("packages").child(fileName);
-        UploadTask uploadTask = reference.putData(model.thumbnailBytes!);
-
-        TaskSnapshot snapshot = await uploadTask.then((snapshot) => snapshot);
-        if (snapshot.state == TaskState.success) {
-          thumbnailImageUrl = await snapshot.ref.getDownloadURL();
-        }
-      }
-
-      if(model.id.isEmpty) {
-        model.id = MyUtils.getNewId(isFromUUuid: false);
-      }
-
-      CateringPackageModel newModel = CateringPackageModel(
-        id: model.id,
-        title: model.title,
-        description: model.description,
-        enabled: model.enabled,
-        price: model.price,
-        thumbnailUrl: thumbnailImageUrl,
-      );
-
-      newPackages.add(newModel);
-    }
-
-    return newPackages;
-  }
-
-  Future<List<String>> uploadPhotos({required String cateringId, required List<CateringPhotoModel> photos}) async {
+  Future<List<String>> uploadPhotos({required String partyPlotId, required List<PartyPlotPhotoModel> photos}) async {
     List<String> newPhotos = [];
 
-    if (cateringId.isEmpty) {
-      cateringId = "catering";
+    if (partyPlotId.isEmpty) {
+      partyPlotId = "catering";
     }
 
-    for (CateringPhotoModel model in photos) {
+    for (PartyPlotPhotoModel model in photos) {
       String thumbnailImageUrl = model.imageUrl;
-      if(model.imageBytes != null) {
+      if (model.imageBytes != null) {
         String fileName = "${DateTime.now().millisecondsSinceEpoch}.png";
-        Reference reference = FirebaseStorage.instance.ref().child("catering").child(cateringId).child("photos").child(fileName);
+        Reference reference = FirebaseStorage.instance.ref().child("partyPlot").child(partyPlotId).child("photos").child(fileName);
         UploadTask uploadTask = reference.putData(model.imageBytes!);
 
         TaskSnapshot snapshot = await uploadTask.then((snapshot) => snapshot);
@@ -265,8 +219,8 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
     isLoading = true;
     mySetState();
 
-    String cateringId = cateringModel.id;
-    if(cateringId.isEmpty) {
+    String cateringId = partyPlotModel.id;
+    if (cateringId.isEmpty) {
       cateringId = context.read<AuthenticationProvider>().userId.get();
     }
 
@@ -275,34 +229,36 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
       finalThumbnailUrl = thumbnailImageUrl!;
     } else {
       if (thumbnailImageBytes != null) {
-        finalThumbnailUrl = await uploadThumbnailImage(cateringId: cateringId, image: thumbnailImageBytes!);
+        finalThumbnailUrl = await uploadThumbnailImage(partyPlotId: cateringId, image: thumbnailImageBytes!);
       } else {
         finalThumbnailUrl = "";
       }
     }
 
-    List<CateringPackageModel> finalPackages = await uploadPackages(cateringId: cateringId, packages: packages);
-    List<String> finalPhotos = await uploadPhotos(cateringId: cateringId, photos: photos);
+    List<String> finalPhotos = await uploadPhotos(partyPlotId: cateringId, photos: photos);
 
-    CateringModel newCateringModel = CateringModel(
-      id: cateringModel.id,
+    PartyPlotModel newPartyPlotModel = PartyPlotModel(
+      id: partyPlotModel.id,
       title: titleController.text,
       description: descriptionController.text,
-      enabled: cateringModel.enabled,
+      enabled: partyPlotModel.enabled,
       thumbnailUrl: finalThumbnailUrl,
-      packages: finalPackages,
       photos: finalPhotos,
-      createdTime: cateringModel.createdTime,
-      updatedTime: cateringModel.updatedTime,
+      minPeople: partyPlotModel.minPeople,
+      maxPeople: partyPlotModel.maxPeople,
+      locationCity: locationCity ?? "",
+      locationArea: locationArea ?? "",
+      createdTime: partyPlotModel.createdTime,
+      updatedTime: partyPlotModel.updatedTime,
     );
 
-    bool isUpdated = await adminUserController.updateCateringModel(cateringId: cateringId, cateringModel: newCateringModel);
+    bool isUpdated = await adminUserController.updatePartyPlotModel(partyPlotId: cateringId, partyPlotModel: newPartyPlotModel);
 
     isLoading = false;
     mySetState();
 
-    if(isUpdated) {
-      if(context.checkMounted() && context.mounted) Navigator.pop(context);
+    if (isUpdated) {
+      if (context.checkMounted() && context.mounted) Navigator.pop(context);
     }
   }
 
@@ -314,7 +270,7 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
     adminUserProvider = context.read<AdminUserProvider>();
     adminUserController = AdminUserController(authenticationProvider: authenticationProvider, adminUserProvider: adminUserProvider);
 
-    initializeFromModel(model: context.read<AdminUserProvider>().cateringModel.get());
+    initializeFromModel(model: context.read<AdminUserProvider>().partyPlotModel.get());
   }
 
   @override
@@ -326,7 +282,7 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Catering Details",
+            "Party Plot Details",
           ),
         ),
         body: SingleChildScrollView(
@@ -346,7 +302,9 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
                   const SizedBox(height: 10),
                   getPhotosListviewWidget(),
                   const SizedBox(height: 10),
-                  getPackagesListviewWidget(),
+                  getPeopleSizeRangeSlider(),
+                  const SizedBox(height: 10),
+                  getLocationWidget(),
                   const SizedBox(height: 10),
                   getSubmitButton(),
                 ],
@@ -494,9 +452,9 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
       children: [
         Expanded(
           child: SwitchListTile(
-            value: cateringModel.enabled,
+            value: partyPlotModel.enabled,
             onChanged: (bool value) {
-              cateringModel.enabled = value;
+              partyPlotModel.enabled = value;
               mySetState();
             },
             title: const Text("Enabled"),
@@ -545,7 +503,7 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
 
               index--;
 
-              CateringPhotoModel photoModel = photos[index];
+              PartyPlotPhotoModel photoModel = photos[index];
 
               Widget imageWidget;
               if (photoModel.imageBytes != null) {
@@ -596,140 +554,118 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
     );
   }
 
-  Widget getPackagesListviewWidget() {
-    int listViewLength = packages.length;
-    MyPrint.printOnConsole("Packages listViewLength:$listViewLength");
-
+  Widget getPeopleSizeRangeSlider() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Packages",
-              style: themeData.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            IconButton(
-              onPressed: () async {
-                dynamic value = await NavigationController.navigateToAddEditAdminCateringPackageScreen(
-                  navigationOperationParameters: NavigationOperationParameters(
-                    context: context,
-                    navigationType: NavigationType.pushNamed,
-                  ),
-                  arguments: const AddEditAdminCateringPackageScreenNavigationArguments(cateringPackageModelTemp: null),
-                );
-                MyPrint.printOnConsole("value:$value");
-                MyPrint.printOnConsole("value type:${value.runtimeType}");
-
-                if(value is CateringPackageModelTemp) {
-                  packages.add(value);
-                  mySetState();
-                }
-              },
-              icon: const Icon(Icons.add),
-            ),
-          ],
+        Text(
+          "People Size",
+          style: themeData.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: 10),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: listViewLength,
-          itemBuilder: (BuildContext context, int index) {
-            CateringPackageModelTemp modelTemp = packages[index];
-
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 5),
-              child: getPackageCard(modelTemp: modelTemp),
-            );
+        RangeSlider(
+          onChanged: (RangeValues values) {
+            partyPlotModel.minPeople = values.start;
+            partyPlotModel.maxPeople = values.end;
+            mySetState();
           },
+          values: RangeValues(partyPlotModel.minPeople, partyPlotModel.maxPeople),
+          min: 0,
+          max: 5000,
+          divisions: 50,
+          labels: RangeLabels(partyPlotModel.minPeople.round().toString(), partyPlotModel.maxPeople.round().toString()),
         ),
       ],
     );
   }
 
-  Widget getPackageCard({required CateringPackageModelTemp modelTemp}) {
-    Widget imageWidget;
-    if (modelTemp.thumbnailBytes != null) {
-      imageWidget = Image.memory(modelTemp.thumbnailBytes!);
-    } else if (modelTemp.thumbnailUrl.isNotEmpty) {
-      imageWidget = CommonCachedNetworkImage(imageUrl: modelTemp.thumbnailUrl);
-    } else {
-      imageWidget = const Center(child: Text("Invalid Image"));
+  Widget getLocationWidget() {
+    List<String> cityList = AppConstants.cityAreaMap.keys.toList();
+    if ((cityList.isEmpty && locationCity.checkNotEmpty) || (locationCity != null && !cityList.contains(locationCity))) {
+      locationCity = null;
     }
 
-    return Card(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          border: Border.all(color: themeData.primaryColor),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            imageWidget,
-            const SizedBox(height: 10),
-            Text(modelTemp.title),
-            Text(modelTemp.description),
-            Text("Price: ${modelTemp.price}"),
-            SwitchListTile(
-              value: modelTemp.enabled,
-              onChanged: (bool value) {
-                modelTemp.enabled = value;
-                mySetState();
-              },
-              title: const Text("Enabled"),
-            ),
-            Row(
-              children: [
-                CommonSubmitButton(
-                  onTap: () async {
-                    dynamic value = await NavigationController.navigateToAddEditAdminCateringPackageScreen(
-                      navigationOperationParameters: NavigationOperationParameters(
-                        context: context,
-                        navigationType: NavigationType.pushNamed,
-                      ),
-                      arguments: AddEditAdminCateringPackageScreenNavigationArguments(cateringPackageModelTemp: modelTemp),
-                    );
-                    MyPrint.printOnConsole("value:$value");
-                    MyPrint.printOnConsole("value type:${value.runtimeType}");
+    List<String> areaList = [];
+    if (locationCity != null) {
+      areaList.addAll(AppConstants.cityAreaMap[locationCity] ?? <String>[]);
+      if ((areaList.isEmpty && locationArea.checkNotEmpty) || (locationArea != null && !areaList.contains(locationArea))) {
+        locationArea = null;
+      }
+    } else {
+      if (locationArea != null) locationArea = null;
+    }
 
-                    if(value is CateringPackageModelTemp) {
-                      modelTemp.id = value.id;
-                      modelTemp.title = value.title;
-                      modelTemp.description = value.description;
-                      modelTemp.thumbnailUrl = value.thumbnailUrl;
-                      modelTemp.thumbnailBytes = value.thumbnailBytes;
-                      modelTemp.price = value.price;
-                      modelTemp.enabled = value.enabled;
-                      mySetState();
-                    }
-                  },
-                  text: "Edit",
-                  verticalPadding: 10,
-                  horizontalPadding: 20,
-                  fontSize: 15,
-                ),
-                CommonSubmitButton(
-                  onTap: () async {
-                    packages.remove(modelTemp);
-                    mySetState();
-                  },
-                  text: "Delete",
-                  verticalPadding: 10,
-                  horizontalPadding: 20,
-                  fontSize: 15,
-                  backgroundColor: Colors.red,
-                ),
-              ],
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          "Location",
+          style: themeData.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
+        const SizedBox(height: 10),
+        DropdownButton<String>(
+          value: locationCity,
+          onChanged: (String? value) {
+            locationCity = value;
+            if (value == null) {
+              locationArea = null;
+            }
+            mySetState();
+          },
+          hint: Text(
+            "Select City",
+            style: themeData.textTheme.labelMedium,
+          ),
+          dropdownColor: Colors.white,
+          isDense: false,
+          underline: const SizedBox(),
+          items: cityList.map((e) {
+            return DropdownMenuItem<String>(
+              value: e,
+              child: Text(
+                e,
+                style: themeData.textTheme.labelMedium?.copyWith(
+                  // color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  // fontSize: 20,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+        DropdownButton<String>(
+          value: locationArea,
+          onChanged: (String? value) {
+            locationArea = value;
+            mySetState();
+          },
+          hint: Text(
+            "Select Area",
+            style: themeData.textTheme.labelMedium,
+          ),
+          dropdownColor: Colors.white,
+          isDense: false,
+          underline: const SizedBox(),
+          items: areaList.map((e) {
+            return DropdownMenuItem<String>(
+              value: e,
+              child: Text(
+                e,
+                style: themeData.textTheme.labelMedium?.copyWith(
+                  // color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  // fontSize: 20,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -740,26 +676,20 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
 
         bool isFormValid = _formKey.currentState?.validate() ?? false;
         bool isThumbnailValid = thumbnailImageBytes != null || thumbnailImageUrl.checkNotEmpty;
-        bool isPackagesValid = packages.isNotEmpty;
         bool isPhotosValid = photos.isNotEmpty;
+        bool isLocationValid = locationCity.checkNotEmpty && locationArea.checkNotEmpty;
 
-        if (isFormValid && isThumbnailValid && isPackagesValid && isPhotosValid) {
+        if (isFormValid && isThumbnailValid && isPhotosValid && isLocationValid) {
           //MyPrint.printOnConsole("Valid");
           editDetails();
-        }
-        else if(!isFormValid) {
-
-        }
-        else if(!isThumbnailValid) {
+        } else if (!isFormValid) {
+        } else if (!isThumbnailValid) {
           MyToast.showError(context: context, msg: "Thumbnail must be selected");
-        }
-        else if(!isPackagesValid) {
-          MyToast.showError(context: context, msg: "Packages must not be empty");
-        }
-        else if(!isPhotosValid) {
+        } else if (!isPhotosValid) {
           MyToast.showError(context: context, msg: "Photos must not be empty");
-        }
-        else {
+        } else if (!isLocationValid) {
+          MyToast.showError(context: context, msg: "Location must be selected");
+        } else {
           //MyPrint.printOnConsole("Not Valid");
         }
       },
@@ -771,32 +701,12 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
   }
 }
 
-class CateringPhotoModel {
+class PartyPlotPhotoModel {
   String imageUrl;
   Uint8List? imageBytes;
 
-  CateringPhotoModel({
+  PartyPlotPhotoModel({
     this.imageUrl = "",
     this.imageBytes,
-  });
-}
-
-class CateringPackageModelTemp {
-  String id = "";
-  String title = "";
-  String description = "";
-  String thumbnailUrl = "";
-  Uint8List? thumbnailBytes;
-  bool enabled = false;
-  double price = 0;
-
-  CateringPackageModelTemp({
-    this.id = "",
-    this.title = "",
-    this.description = "",
-    this.thumbnailUrl = "",
-    this.thumbnailBytes,
-    this.enabled = false,
-    this.price = 0,
   });
 }

@@ -10,6 +10,7 @@ import '../../views/catering/screens/add_edit_admin_catering_screen.dart';
 import '../../views/common/screens/splashscreen.dart';
 import '../../views/homescreen/screens/admin_homescreen.dart';
 import '../../views/homescreen/screens/user_homescreen.dart';
+import '../../views/party_plot/screens/add_edit_admin_party_plot_screen.dart';
 import '../../views/profile/screens/user_edit_profile_screen.dart';
 import 'navigation_arguments.dart';
 import 'navigation_operation.dart';
@@ -102,6 +103,11 @@ class NavigationController {
       case AddEditAdminCateringScreen.routeName:
         {
           page = parseAddEditAdminCateringScreen(settings: settings);
+          break;
+        }
+      case AddEditAdminPartyPlotScreen.routeName:
+        {
+          page = parseAddEditAdminPartyPlotScreen(settings: settings);
           break;
         }
       case AddEditAdminCateringPackageScreen.routeName:
@@ -223,6 +229,10 @@ class NavigationController {
     return const AddEditAdminCateringScreen();
   }
 
+  static Widget? parseAddEditAdminPartyPlotScreen({required RouteSettings settings}) {
+    return const AddEditAdminPartyPlotScreen();
+  }
+
   static Widget? parseAddEditAdminCateringPackageScreen({required RouteSettings settings}) {
     dynamic argument = settings.arguments;
     if (argument is! AddEditAdminCateringPackageScreenNavigationArguments) return null;
@@ -275,6 +285,13 @@ class NavigationController {
     return NavigationOperation.navigate(
         navigationOperationParameters: navigationOperationParameters.copyWith(
       routeName: AddEditAdminCateringScreen.routeName,
+    ));
+  }
+
+  static Future<dynamic> navigateToAddEditAdminPartyPlotScreen({required NavigationOperationParameters navigationOperationParameters}) {
+    return NavigationOperation.navigate(
+        navigationOperationParameters: navigationOperationParameters.copyWith(
+      routeName: AddEditAdminPartyPlotScreen.routeName,
     ));
   }
 

@@ -4,6 +4,22 @@ import 'typedefs.dart';
 class AppConstants {
   static const int cateringsDocumentLimitForPagination = 10;
   static const int cateringsRefreshLimitForPagination = 3;
+
+  static const Map<String, List<String>> cityAreaMap = {
+    "Vadodara" : [
+      "Akota",
+      "Manjalpur",
+      "Vaghodia",
+      "Sama",
+      "Gotri",
+    ],
+    "Ahmedabad" : [
+      "Naroda",
+      "Narol",
+      "Kalupur",
+      "Sabarmati",
+    ],
+  };
 }
 
 class FirestoreExceptionCodes {
