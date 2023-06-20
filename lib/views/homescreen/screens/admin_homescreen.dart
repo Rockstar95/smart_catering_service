@@ -1,27 +1,26 @@
-import 'package:smart_catering_service/backend/course/catering_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_catering_service/backend/catering/catering_provider.dart';
 
 import '../../../backend/home_screen/home_screen_provider.dart';
 import '../../../configs/styles.dart';
 import '../../../utils/my_print.dart';
 import '../../../utils/my_safe_state.dart';
-import '../../catering/screens/catering_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  static const String routeName = "/HomeScreen";
+class AdminHomeScreen extends StatefulWidget {
+  static const String routeName = "/AdminHomeScreen";
 
-  const HomeScreen({
+  const AdminHomeScreen({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin, MySafeState {
+class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProviderStateMixin, MySafeState {
   int _currentIndex = 0;
   late TabController _tabController;
 
@@ -65,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   //endregion
 
-  late CourseProvider courseProvider;
+  late CateringProvider cateringProvider;
 
   @override
   void initState() {
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _tabController.addListener(_handleTabSelection);
     _tabController.animation?.addListener(_handleTabSelectionInAnimation);
 
-    courseProvider = context.read<CourseProvider>();
+    cateringProvider = context.read<CateringProvider>();
   }
 
   @override
@@ -203,7 +202,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   //endregion
 
   Widget getCateringScreen() {
-    cateringScreenWidget ??= CateringScreen(courseProvider: courseProvider);
+    cateringScreenWidget ??= const Center(
+      child: Text("Enquiry"),
+    );
 
     return cateringScreenWidget!;
   }

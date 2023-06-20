@@ -1,9 +1,11 @@
-import 'package:smart_catering_service/configs/constants.dart';
-import 'package:smart_catering_service/models/user/data_model/user_model.dart';
-import 'package:smart_catering_service/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_catering_service/backend/common/app_controller.dart';
+import 'package:smart_catering_service/configs/constants.dart';
+import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
+import 'package:smart_catering_service/models/user/data_model/user_model.dart';
+import 'package:smart_catering_service/utils/extensions.dart';
 
 import '../../../backend/authentication/authentication_controller.dart';
 import '../../../backend/authentication/authentication_provider.dart';
@@ -54,38 +56,66 @@ class _SplashScreenState extends State<SplashScreen> {
     MyPrint.printOnConsole("isExist:$isExist", tag: tag);
 
     await authenticationController.startUserSubscription();
-    UserModel? userModel = authenticationProvider.userModel.get();
 
     if (context.checkMounted() && context.mounted) {
-      if(userModel == null) {
-        NavigationController.navigateToLoginScreen(
-          navigationOperationParameters: NavigationOperationParameters(
-            context: context,
-            navigationType: NavigationType.pushNamedAndRemoveUntil,
-          ),
-        );
-        return;
-      }
-      else if(userModel.name.isEmpty) {
-        NavigationController.navigateToEditProfileScreen(
-          navigationOperationParameters: NavigationOperationParameters(
-            context: context,
-            navigationType: NavigationType.pushNamedAndRemoveUntil,
-          ),
-          arguments: EditProfileScreenNavigationArguments(
-            userModel: userModel,
-            isSignUp: true,
-          ),
-        );
-        return;
+      if(AppController.isAdminApp) {
+        AdminUserModel? adminUserModel = authenticationProvider.adminUserModel.get();
+        if(adminUserModel == null) {
+          NavigationController.navigateToLoginScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+          );
+        }
+        else if(!adminUserModel.isProfileSet) {
+          NavigationController.navigateToAdminRegistrationScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+            arguments: AdminRegistrationScreenNavigationArguments(adminUserModel: adminUserModel),
+          );
+        }
+        else {
+          NavigationController.navigateToAdminHomeScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+          );
+        }
       }
       else {
-        NavigationController.navigateToHomeScreen(
-          navigationOperationParameters: NavigationOperationParameters(
-            context: context,
-            navigationType: NavigationType.pushNamedAndRemoveUntil,
-          ),
-        );
+        UserModel? userModel = authenticationProvider.userModel.get();
+        if(userModel == null) {
+          NavigationController.navigateToLoginScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+          );
+        }
+        else if(userModel.name.isEmpty) {
+          NavigationController.navigateToUserEditProfileScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+            arguments: UserEditProfileScreenNavigationArguments(
+              userModel: userModel,
+              isSignUp: true,
+            ),
+          );
+        }
+        else {
+          NavigationController.navigateToUserHomeScreen(
+            navigationOperationParameters: NavigationOperationParameters(
+              context: context,
+              navigationType: NavigationType.pushNamedAndRemoveUntil,
+            ),
+          );
+        }
       }
     }
   }

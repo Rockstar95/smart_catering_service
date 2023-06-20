@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
+import 'package:smart_catering_service/backend/common/app_controller.dart';
+import 'package:smart_catering_service/backend/navigation/navigation_arguments.dart';
 import 'package:smart_catering_service/backend/navigation/navigation_controller.dart';
 import 'package:smart_catering_service/backend/navigation/navigation_operation_parameters.dart';
 import 'package:smart_catering_service/backend/navigation/navigation_type.dart';
@@ -11,6 +13,8 @@ import 'package:smart_catering_service/utils/my_safe_state.dart';
 import 'package:smart_catering_service/views/common/components/modal_progress_hud.dart';
 
 import '../../../backend/authentication/authentication_controller.dart';
+import '../../../models/admin_user/data_model/admin_user_model.dart';
+import '../../../models/user/data_model/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   static BuildContext? context;
@@ -44,13 +48,68 @@ class _LoginScreenState extends State<LoginScreen> with MySafeState {
     mySetState();
 
     if (isLoggedIn) {
+      await authenticationController.startUserSubscription();
+
       if (context.checkMounted() && context.mounted) {
-        NavigationController.navigateToHomeScreen(
-          navigationOperationParameters: NavigationOperationParameters(
-            context: context,
-            navigationType: NavigationType.pushNamedAndRemoveUntil,
-          ),
-        );
+        if(AppController.isAdminApp) {
+          AdminUserModel? adminUserModel = authenticationProvider.adminUserModel.get();
+          if(adminUserModel == null) {
+            NavigationController.navigateToLoginScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+            );
+          }
+          else if(!adminUserModel.isProfileSet) {
+            NavigationController.navigateToAdminRegistrationScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+              arguments: AdminRegistrationScreenNavigationArguments(adminUserModel: adminUserModel),
+            );
+          }
+          else {
+            NavigationController.navigateToAdminHomeScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+            );
+          }
+        }
+        else {
+          UserModel? userModel = authenticationProvider.userModel.get();
+          if(userModel == null) {
+            NavigationController.navigateToLoginScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+            );
+          }
+          else if(userModel.name.isEmpty) {
+            NavigationController.navigateToUserEditProfileScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+              arguments: UserEditProfileScreenNavigationArguments(
+                userModel: userModel,
+                isSignUp: true,
+              ),
+            );
+          }
+          else {
+            NavigationController.navigateToUserHomeScreen(
+              navigationOperationParameters: NavigationOperationParameters(
+                context: context,
+                navigationType: NavigationType.pushNamedAndRemoveUntil,
+              ),
+            );
+          }
+        }
       }
     }
   }

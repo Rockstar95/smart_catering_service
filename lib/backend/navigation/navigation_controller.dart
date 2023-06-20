@@ -3,11 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/my_print.dart';
+import '../../views/admin_registration/screens/admin_registration_screen.dart';
 import '../../views/authentication/screens/login_screen.dart';
-import '../../views/catering/screens/course_details_screen.dart';
 import '../../views/common/screens/splashscreen.dart';
-import '../../views/homescreen/screens/homescreen.dart';
-import '../../views/profile/screens/edit_profile_screen.dart';
+import '../../views/homescreen/screens/admin_homescreen.dart';
+import '../../views/homescreen/screens/user_homescreen.dart';
+import '../../views/profile/screens/user_edit_profile_screen.dart';
 import 'navigation_arguments.dart';
 import 'navigation_operation.dart';
 import 'navigation_operation_parameters.dart';
@@ -43,7 +44,7 @@ class NavigationController {
   }
 
   static Route? onMainAppAdminGeneratedRoutes(RouteSettings settings) {
-    MyPrint.printOnConsole("onAdminMainGeneratedRoutes called for ${settings.name} with arguments:${settings.arguments}");
+    MyPrint.printOnConsole("onMainAppAdminGeneratedRoutes called for ${settings.name} with arguments:${settings.arguments}");
 
     // if(navigationCount == 2 && Uri.base.hasFragment && Uri.base.fragment != "/") {
     //   return null;
@@ -86,14 +87,14 @@ class NavigationController {
           page = parseLoginScreen(settings: settings);
           break;
         }
-      case HomeScreen.routeName:
+      case AdminRegistrationScreen.routeName:
         {
-          page = parseHomeScreen(settings: settings);
+          page = parseAdminRegistrationScreen(settings: settings);
           break;
         }
-      case CourseDetailsScreen.routeName:
+      case AdminHomeScreen.routeName:
         {
-          page = parseCourseDetailsScreen(settings: settings);
+          page = parseAdminHomeScreen(settings: settings);
           break;
         }
     }
@@ -111,7 +112,7 @@ class NavigationController {
   }
 
   static Route? onMainAppUserGeneratedRoutes(RouteSettings settings) {
-    MyPrint.printOnConsole("onAdminMainGeneratedRoutes called for ${settings.name} with arguments:${settings.arguments}");
+    MyPrint.printOnConsole("onMainAppUserGeneratedRoutes called for ${settings.name} with arguments:${settings.arguments}");
 
     // if(navigationCount == 2 && Uri.base.hasFragment && Uri.base.fragment != "/") {
     //   return null;
@@ -154,19 +155,14 @@ class NavigationController {
           page = parseLoginScreen(settings: settings);
           break;
         }
-      case EditProfileScreen.routeName:
+      case UserEditProfileScreen.routeName:
         {
-          page = parseEditProfileScreen(settings: settings);
+          page = parseUserEditProfileScreen(settings: settings);
           break;
         }
-      case HomeScreen.routeName:
+      case UserHomeScreen.routeName:
         {
-          page = parseHomeScreen(settings: settings);
-          break;
-        }
-      case CourseDetailsScreen.routeName:
-        {
-          page = parseCourseDetailsScreen(settings: settings);
+          page = parseUserHomeScreen(settings: settings);
           break;
         }
     }
@@ -188,26 +184,27 @@ class NavigationController {
     return const LoginScreen();
   }
 
-  static Widget? parseEditProfileScreen({required RouteSettings settings}) {
+  static Widget? parseUserEditProfileScreen({required RouteSettings settings}) {
     dynamic argument = settings.arguments;
-    if (argument is EditProfileScreenNavigationArguments) {
-      return EditProfileScreen(arguments: argument);
+    if (argument is UserEditProfileScreenNavigationArguments) {
+      return UserEditProfileScreen(arguments: argument);
     } else {
       return null;
     }
   }
 
-  static Widget? parseHomeScreen({required RouteSettings settings}) {
-    return const HomeScreen();
+  static Widget? parseAdminRegistrationScreen({required RouteSettings settings}) {
+    dynamic argument = settings.arguments;
+    if (argument is! AdminRegistrationScreenNavigationArguments) return null;
+    return AdminRegistrationScreen(arguments: argument);
   }
 
-  static Widget? parseCourseDetailsScreen({required RouteSettings settings}) {
-    dynamic argument = settings.arguments;
-    if (argument is CateringDetailsScreenNavigationArguments) {
-      return CourseDetailsScreen(arguments: argument);
-    } else {
-      return null;
-    }
+  static Widget? parseAdminHomeScreen({required RouteSettings settings}) {
+    return const AdminHomeScreen();
+  }
+
+  static Widget? parseUserHomeScreen({required RouteSettings settings}) {
+    return const UserHomeScreen();
   }
 
   //endregion
@@ -220,32 +217,36 @@ class NavigationController {
     ));
   }
 
-  static Future<dynamic> navigateToEditProfileScreen({required NavigationOperationParameters navigationOperationParameters, required EditProfileScreenNavigationArguments arguments}) {
+  static Future<dynamic> navigateToUserEditProfileScreen({required NavigationOperationParameters navigationOperationParameters, required UserEditProfileScreenNavigationArguments arguments}) {
     return NavigationOperation.navigate(
       navigationOperationParameters: navigationOperationParameters.copyWith(
-        routeName: EditProfileScreen.routeName,
+        routeName: UserEditProfileScreen.routeName,
         arguments: arguments,
       ),
     );
   }
 
-  static Future<dynamic> navigateToHomeScreen({required NavigationOperationParameters navigationOperationParameters}) {
+  static Future<dynamic> navigateToAdminRegistrationScreen({required NavigationOperationParameters navigationOperationParameters, required AdminRegistrationScreenNavigationArguments arguments}) {
+    return NavigationOperation.navigate(
+      navigationOperationParameters: navigationOperationParameters.copyWith(
+        routeName: AdminRegistrationScreen.routeName,
+        arguments: arguments,
+      ),
+    );
+  }
+
+  static Future<dynamic> navigateToAdminHomeScreen({required NavigationOperationParameters navigationOperationParameters}) {
     return NavigationOperation.navigate(
         navigationOperationParameters: navigationOperationParameters.copyWith(
-      routeName: HomeScreen.routeName,
+      routeName: AdminHomeScreen.routeName,
     ));
   }
 
-  static Future<dynamic> navigateToCourseDetailsScreen({
-    required NavigationOperationParameters navigationOperationParameters,
-    required CateringDetailsScreenNavigationArguments arguments,
-  }) {
+  static Future<dynamic> navigateToUserHomeScreen({required NavigationOperationParameters navigationOperationParameters}) {
     return NavigationOperation.navigate(
-      navigationOperationParameters: navigationOperationParameters.copyWith(
-        routeName: CourseDetailsScreen.routeName,
-        arguments: arguments,
-      ),
-    );
+        navigationOperationParameters: navigationOperationParameters.copyWith(
+      routeName: UserHomeScreen.routeName,
+    ));
   }
   //endregion
 }

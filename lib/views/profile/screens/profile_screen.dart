@@ -53,12 +53,12 @@ class _ProfileScreenState extends State<ProfileScreen> with MySafeState {
                         option: "Edit",
                         ontap: () async {
                           if (userModel != null) {
-                            await NavigationController.navigateToEditProfileScreen(
+                            await NavigationController.navigateToUserEditProfileScreen(
                               navigationOperationParameters: NavigationOperationParameters(
                                 context: context,
                                 navigationType: NavigationType.pushNamed,
                               ),
-                              arguments: EditProfileScreenNavigationArguments(userModel: userModel),
+                              arguments: UserEditProfileScreenNavigationArguments(userModel: userModel),
                             );
 
                             mySetState();

@@ -1,3 +1,4 @@
+import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
 import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
 
 import '../../models/user/data_model/user_model.dart';
@@ -14,11 +15,19 @@ class OtpScreenNavigationArguments extends NavigationArguments {
   });
 }
 
-class EditProfileScreenNavigationArguments extends NavigationArguments {
+class AdminRegistrationScreenNavigationArguments extends NavigationArguments {
+  final AdminUserModel adminUserModel;
+
+  const AdminRegistrationScreenNavigationArguments({
+    required this.adminUserModel,
+  });
+}
+
+class UserEditProfileScreenNavigationArguments extends NavigationArguments {
   final UserModel userModel;
   final bool isSignUp;
 
-  const EditProfileScreenNavigationArguments({
+  const UserEditProfileScreenNavigationArguments({
     required this.userModel,
     this.isSignUp = false,
   });

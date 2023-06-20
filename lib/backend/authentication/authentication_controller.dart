@@ -1,10 +1,14 @@
 import 'dart:async';
 
-import 'package:smart_catering_service/utils/extensions.dart';
-import 'package:smart_catering_service/utils/my_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:smart_catering_service/backend/admin_user/admin_user_controller.dart';
+import 'package:smart_catering_service/backend/common/app_controller.dart';
+import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
+import 'package:smart_catering_service/utils/extensions.dart';
+import 'package:smart_catering_service/utils/my_toast.dart';
 
 import '../../configs/constants.dart';
 import '../../configs/typedefs.dart';
@@ -53,7 +57,7 @@ class AuthenticationController {
 
     MyPrint.printOnConsole("FirebaseUsr:$firebaseUser", tag: tag);
 
-    if (firebaseUser != null && (firebaseUser.phoneNumber ?? "").isNotEmpty) {
+    if (firebaseUser != null && (firebaseUser.email ?? "").isNotEmpty) {
       provider.setAuthenticationDataFromFirebaseUser(
         firebaseUser: firebaseUser,
         isNotify: false,
@@ -78,26 +82,44 @@ class AuthenticationController {
       return isUserExist;
     }
 
-    UserController userController = UserController();
-
     try {
-      UserModel? userModel = await userController.userRepository.getUserModelFromId(userId: userId);
-      MyPrint.printOnConsole("userModel:'$userModel'", tag: tag);
+      if (AppController.isAdminApp) {
+        AdminUserController adminUserController = AdminUserController();
+        AdminUserModel? adminUserModel = await adminUserController.adminUserRepository.getAdminUserModelFromId(userId: userId);
+        MyPrint.printOnConsole("adminUserModel:'$adminUserModel'", tag: tag);
 
-      if (userModel != null) {
-        isUserExist = true;
+        if (adminUserModel != null) {
+          isUserExist = true;
 
-        authenticationProvider.userModel.set(value: userModel, isNotify: false);
+          authenticationProvider.adminUserModel.set(value: adminUserModel, isNotify: false);
+        } else {
+          AdminUserModel createdUserModel = AdminUserModel(
+            id: userId,
+            email: authenticationProvider.email.get(),
+          );
+          bool isCreated = await adminUserController.createNewUser(userModel: createdUserModel);
+          MyPrint.printOnConsole("isUserCreated:'$isCreated'", tag: tag);
+
+          authenticationProvider.adminUserModel.set(value: isCreated ? createdUserModel : null, isNotify: false);
+        }
       } else {
-        UserModel createdUserModel = UserModel(
-          id: userId,
-          email: authenticationProvider.email.get(),
-        );
-        bool isCreated = await userController.createNewUser(userModel: createdUserModel);
-        MyPrint.printOnConsole("isUserCreated:'$isCreated'", tag: tag);
+        UserController userController = UserController();
+        UserModel? userModel = await userController.userRepository.getUserModelFromId(userId: userId);
+        MyPrint.printOnConsole("userModel:'$userModel'", tag: tag);
 
-        if (isCreated) {
-          authenticationProvider.userModel.set(value: createdUserModel, isNotify: false);
+        if (userModel != null) {
+          isUserExist = true;
+
+          authenticationProvider.userModel.set(value: userModel, isNotify: false);
+        } else {
+          UserModel createdUserModel = UserModel(
+            id: userId,
+            email: authenticationProvider.email.get(),
+          );
+          bool isCreated = await userController.createNewUser(userModel: createdUserModel);
+          MyPrint.printOnConsole("isUserCreated:'$isCreated'", tag: tag);
+
+          authenticationProvider.userModel.set(value: isCreated ? createdUserModel : null, isNotify: false);
         }
       }
     } catch (e, s) {
@@ -124,7 +146,7 @@ class AuthenticationController {
     );
     MyPrint.printOnConsole("isUserExist:$isUserExist", tag: tag);
 
-    if(!isUserExist) {
+    if (!isUserExist) {
       provider.userId.set(value: "");
     }
 
@@ -145,36 +167,74 @@ class AuthenticationController {
     }
 
     Completer<bool> completer = Completer<bool>();
-    provider.setUserStreamSubscription(
-      subscription: FirebaseNodes.userDocumentReference(userId: userId).snapshots().listen(
-        (MyFirestoreDocumentSnapshot snapshot) async {
-          if (!completer.isCompleted) {
-            completer.complete(true);
-          }
 
-          UserModel? userModel;
-          if (snapshot.exists && (snapshot.data() ?? {}).isNotEmpty) {
-            userModel = UserModel.fromMap(snapshot.data()!);
-          }
+    if (AppController.isAdminApp) {
+      provider.setUserStreamSubscription(
+        subscription: FirebaseNodes.adminUserDocumentReference(userId: userId).snapshots().listen(
+          (MyFirestoreDocumentSnapshot snapshot) async {
+            MyPrint.printOnConsole("AdminUser stream snapshot:${snapshot.data()}");
 
-          provider.userId.set(value: userModel?.id ?? "", isNotify: false);
-          provider.userModel.set(value: userModel, isNotify: true);
-        },
-        onDone: () {
-          if (!completer.isCompleted) {
-            completer.complete(true);
-          }
-        },
-        onError: (Object e, StackTrace s) {
-          if (!completer.isCompleted) {
-            completer.complete(false);
-          }
-        },
-        cancelOnError: true,
-      ),
-      isCancelPreviousSubscription: true,
-      isNotify: true,
-    );
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+
+            AdminUserModel? userModel;
+            if (snapshot.exists && (snapshot.data() ?? {}).isNotEmpty) {
+              userModel = AdminUserModel.fromMap(snapshot.data()!);
+            }
+
+            provider.userId.set(value: userModel?.id ?? "", isNotify: false);
+            provider.adminUserModel.set(value: userModel, isNotify: true);
+          },
+          onDone: () {
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+          },
+          onError: (Object e, StackTrace s) {
+            if (!completer.isCompleted) {
+              completer.complete(false);
+            }
+          },
+          cancelOnError: true,
+        ),
+        isCancelPreviousSubscription: true,
+        isNotify: true,
+      );
+    } else {
+      provider.setUserStreamSubscription(
+        subscription: FirebaseNodes.userDocumentReference(userId: userId).snapshots().listen(
+          (MyFirestoreDocumentSnapshot snapshot) async {
+            MyPrint.printOnConsole("User stream snapshot:${snapshot.data()}");
+
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+
+            UserModel? userModel;
+            if (snapshot.exists && (snapshot.data() ?? {}).isNotEmpty) {
+              userModel = UserModel.fromMap(snapshot.data()!);
+            }
+
+            provider.userId.set(value: userModel?.id ?? "", isNotify: false);
+            provider.userModel.set(value: userModel, isNotify: true);
+          },
+          onDone: () {
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+          },
+          onError: (Object e, StackTrace s) {
+            if (!completer.isCompleted) {
+              completer.complete(false);
+            }
+          },
+          cancelOnError: true,
+        ),
+        isCancelPreviousSubscription: true,
+        isNotify: true,
+      );
+    }
 
     await completer.future;
 
@@ -186,9 +246,7 @@ class AuthenticationController {
 
     AuthenticationProvider provider = authenticationProvider;
 
-    provider.stopUserStreamSubscription(isNotify: false);
-    provider.userId.set(value: "", isNotify: false);
-    provider.userModel.set(value: null, isNotify: true);
+    provider.resetData(isNotify: false);
   }
 
   //endregion
@@ -226,11 +284,7 @@ class AuthenticationController {
       return false;
     }
 
-    AuthenticationProvider provider = authenticationProvider;
-
     stopUserSubscription();
-
-    provider.resetData(isNotify: false);
 
     if (context != null && context.checkMounted() && context.mounted) {
       // CourseProvider courseProvider = context.read<CourseProvider>();
@@ -239,6 +293,12 @@ class AuthenticationController {
 
     try {
       Future.wait([
+        GoogleSignIn().signOut().then((value) {
+          MyPrint.printOnConsole("Logged Out User From Google Auth");
+        }).catchError((e, s) {
+          MyPrint.printOnConsole("Error in Logging Out User From Google:$e");
+          MyPrint.printOnConsole(s);
+        }),
         FirebaseAuth.instance.signOut().then((value) {
           MyPrint.printOnConsole("Logged Out User From Firebase Auth");
         }).catchError((e, s) {
