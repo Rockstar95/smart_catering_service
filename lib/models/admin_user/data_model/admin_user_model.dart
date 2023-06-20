@@ -6,6 +6,7 @@ import '../../../utils/parsing_helper.dart';
 class AdminUserModel {
   String id = "";
   String email = "";
+  bool isProfileSet = false;
   bool isCateringEnabled = false;
   bool isPartyPlotEnabled = false;
   Timestamp? createdTime;
@@ -14,6 +15,7 @@ class AdminUserModel {
   AdminUserModel({
     this.id = "",
     this.email = "",
+    this.isProfileSet = false,
     this.isCateringEnabled = false,
     this.isPartyPlotEnabled = false,
     this.createdTime,
@@ -31,6 +33,7 @@ class AdminUserModel {
   void initializeFromMap(Map<String, dynamic> map) {
     id = ParsingHelper.parseStringMethod(map['id']);
     email = ParsingHelper.parseStringMethod(map['email']);
+    isProfileSet = ParsingHelper.parseBoolMethod(map['isProfileSet']);
     isCateringEnabled = ParsingHelper.parseBoolMethod(map['isCateringEnabled']);
     isPartyPlotEnabled = ParsingHelper.parseBoolMethod(map['isPartyPlotEnabled']);
     createdTime = ParsingHelper.parseTimestampMethod(map['createdTime']);
@@ -41,6 +44,7 @@ class AdminUserModel {
     return <String, dynamic>{
       "id": id,
       "email": email,
+      "isProfileSet": isProfileSet,
       "isCateringEnabled": isCateringEnabled,
       "isPartyPlotEnabled": isPartyPlotEnabled,
       "createdTime": toJson ? createdTime?.toDate().millisecondsSinceEpoch : createdTime,
