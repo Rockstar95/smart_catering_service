@@ -116,15 +116,15 @@ class AppTheme {
       scaffoldBackgroundColor: styles.lightBackgroundColor,
       appBarTheme: AppBarTheme(
         centerTitle: false,
-        toolbarHeight: 70,
+        // toolbarHeight: 70,
         elevation: 0,
-        titleTextStyle: lightAppBarTextTheme.titleLarge?.copyWith(
+        titleTextStyle: lightAppBarTextTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
           color: styles.lightAppBarTextColor,
-          fontSize: 24,
+          // fontSize: 24,
         ),
-        toolbarTextStyle: lightAppBarTextTheme.titleLarge?.copyWith(
+        toolbarTextStyle: lightAppBarTextTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
@@ -268,11 +268,11 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
-        titleTextStyle: lightAppBarTextTheme.titleLarge?.copyWith(
+        titleTextStyle: lightAppBarTextTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
-        toolbarTextStyle: lightAppBarTextTheme.titleLarge?.copyWith(
+        toolbarTextStyle: lightAppBarTextTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
