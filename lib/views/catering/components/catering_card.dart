@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_catering_service/models/catering/data_model/catering_model.dart';
+import 'package:smart_catering_service/views/catering/screens/catering_detail.dart';
 
 import '../../common/components/common_cachednetwork_image.dart';
 import '../../common/components/common_text.dart';
@@ -19,7 +20,9 @@ class CateringCard extends StatelessWidget {
     ThemeData themeData = Theme.of(context);
 
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+  Navigator.push(context, MaterialPageRoute(builder: (ctx)=>Catering_details(cateringModel: cateringModel)));
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(

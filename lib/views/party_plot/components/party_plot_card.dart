@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_catering_service/models/party_plot/data_model/party_plot_model.dart';
+import 'package:smart_catering_service/views/party_plot/screens/party_plot_detail.dart';
 
 import '../../common/components/common_cachednetwork_image.dart';
 import '../../common/components/common_text.dart';
@@ -19,7 +20,9 @@ class PartyPlotCard extends StatelessWidget {
     ThemeData themeData = Theme.of(context);
 
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (ctx)=>PartyPlotDetail(partyPlotModel: partyPlotModel)));
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(

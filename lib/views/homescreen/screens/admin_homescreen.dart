@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:smart_catering_service/backend/authentication/authentication_provider.dart';
 import 'package:smart_catering_service/backend/catering/catering_provider.dart';
 import 'package:smart_catering_service/models/admin_user/data_model/admin_user_model.dart';
+import 'package:smart_catering_service/views/catering/screens/catering_inquiry_screen.dart';
 
 import '../../../backend/home_screen/home_screen_provider.dart';
 import '../../../configs/styles.dart';
 import '../../../utils/my_print.dart';
 import '../../../utils/my_safe_state.dart';
+import '../../party_plot/screens/party_plot_inquiry.dart';
 import '../../profile/screens/admin_profile_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -238,17 +240,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with TickerProviderSt
   //endregion
 
   Widget getCateringScreen() {
-    cateringScreenWidget ??= const Center(
-      child: Text("Enquiry"),
-    );
+    cateringScreenWidget ??= CateringInquiryScreen();
 
     return cateringScreenWidget!;
   }
 
   Widget getPartyPlotScreen() {
-    myCoursesListScreenWidget ??= const Center(
-      child: Text("Enquiry"),
-    );
+    myCoursesListScreenWidget ??=  PartyPlotInquiryScreen();
 
     return myCoursesListScreenWidget!;
   }
