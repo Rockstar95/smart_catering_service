@@ -15,6 +15,11 @@ class Cat_Inuiry {
   String cat_id="";
   String plan_name="";
   String type="";
+  String bookingdate="";
+  String bookingtime="";
+  String bookingamount="";
+  String bookingperson="";
+
 
   Cat_Inuiry({
     this.id = "",
@@ -27,7 +32,12 @@ class Cat_Inuiry {
     this.inquiry="",
     this.cat_id="",
     this.plan_name="",
-    this.type=""
+    this.type="",
+    this.bookingdate="",
+    this.bookingamount="",
+    this.bookingperson="",
+    this.bookingtime="",
+
   });
 
   Cat_Inuiry.fromMap(Map<String, dynamic> map) {
@@ -50,7 +60,10 @@ class Cat_Inuiry {
     inquiry = ParsingHelper.parseStringMethod(map['inquiry']);
     cat_id = ParsingHelper.parseStringMethod(map['cat_id']);
     type=ParsingHelper.parseStringMethod(map['type']);
-
+    bookingdate=ParsingHelper.parseStringMethod(map['bookingdate']);
+    bookingamount=ParsingHelper.parseStringMethod(map['bookingamount']);
+    bookingtime=ParsingHelper.parseStringMethod(map['bookingtime']);
+    bookingperson=ParsingHelper.parseStringMethod(map['bookingperson']);
   }
 
   Map<String, dynamic> toMap({bool toJson = false}) {

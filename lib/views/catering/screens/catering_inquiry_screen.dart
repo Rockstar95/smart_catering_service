@@ -159,6 +159,43 @@ class _CateringInquiryScreenState extends State<CateringInquiryScreen> {
 
                     fontSize: 12,
                   ),
+                  Container(
+                    color: Colors.black,
+                    margin: EdgeInsets.all(5),
+                    height: 0.6,
+                  ),
+                  const SizedBox(height: 8),
+                  CommonText(
+                    text:"Bookingd date :  ${model.bookingdate}",
+                    maxLines: 2,
+                    textOverFlow: TextOverflow.ellipsis,
+
+                    fontSize: 12,
+                  ),
+                  const SizedBox(height: 8),
+                  CommonText(
+                    text:"Booking time :  ${model.bookingtime}",
+                    maxLines: 2,
+                    textOverFlow: TextOverflow.ellipsis,
+
+                    fontSize: 12,
+                  ),
+                  const SizedBox(height: 8),
+                  CommonText(
+                    text:"Person :  ${model.bookingperson}",
+                    maxLines: 2,
+                    textOverFlow: TextOverflow.ellipsis,
+
+                    fontSize: 12,
+                  ),
+                  const SizedBox(height: 8),
+                  CommonText(
+                    text:"Total Amount :  ${model.bookingamount}",
+                    maxLines: 2,
+                    textOverFlow: TextOverflow.ellipsis,
+
+                    fontSize: 12,
+                  ),
                 ],
               ),
             ),
