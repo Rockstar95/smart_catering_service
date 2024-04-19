@@ -87,6 +87,8 @@ class _AddEditAdminCateringScreenState extends State<AddEditAdminCateringScreen>
       allowMultiple: false,
     );
 
+
+
     if (result != null && result.files.isNotEmpty && (result.files.first.path?.isNotEmpty ?? false)) {
       PlatformFile platformFile = result.files.first;
 
